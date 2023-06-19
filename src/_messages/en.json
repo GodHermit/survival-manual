@@ -1,0 +1,69 @@
+{
+	"title": "Survival Manual",
+	"language": "English",
+	
+	"loading": "Loading",
+	"loadingError": "Loading failed",
+	"tryAgain": "Try again",
+
+	"pageError": {
+		"title": "Oops! Something went wrong",
+		"backHome": "Go to home page"
+	},
+
+	"Header": {
+		"menu": "Menu",
+		"search": "Search",
+		"settings": "Settings",
+		"more": "More",
+		"export": "Export",
+		"share": "Share link",
+		"print": "Print"
+	},
+	"SearchModal": {
+		"title": "Search",
+		"placeholder": "Search...",
+		"cancel": "Cancel"
+		
+	},
+	"ShareLinkModal": {
+		"title": "Share link",
+		"copyButton": "Copy link",
+		"copyButtonSuccess": "Copied",
+		"doneButton": "Done",
+		"copySuccess": "Link copied to clipboard",
+		"copyError": "Failed to copy link to clipboard"
+	},
+	"Settings": {
+		"title": "Settings",
+		"reset": "Reset Settings",
+		"language": "Language",
+		"colorMode": {
+			"label": "Theme",
+			"light": "Light",
+			"dark": "Dark",
+			"amoled": "AMOLED",
+			"system": "System"
+		},
+		"fontSize": {
+			"label": "Font Size",
+			"base": "Default",
+			"sm": "Small",
+			"md": "Medium",
+			"lg": "Large",
+			"xl": "Huge"
+		},
+		"caching": {
+			"heading": "Offline access",
+			"label": "Save Articles Offline",
+			"lastSync": "Last Synced",
+			"language": {
+				"label": "Language",
+				"selected": "Selected",
+				"all": "All"
+			},
+			"saveMedia": "Save Media"
+		}
+		
+	}
+}

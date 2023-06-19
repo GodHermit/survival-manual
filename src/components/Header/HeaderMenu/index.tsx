@@ -1,9 +1,11 @@
 import ShareLinkModal from '@/components/ShareLinkModal';
 import { Kbd, Menu, MenuButton, MenuItem, MenuList, IconButton, useDisclosure } from '@chakra-ui/react';
 import { MdFileDownload, MdLink, MdMoreVert, MdPrint } from 'react-icons/md';
+import { useTranslations } from 'next-intl';
 
 export default function HeaderMenu() {
-	const shareLinkDisclosure = useDisclosure();	
+	const shareLinkDisclosure = useDisclosure();
+	const t = useTranslations();
 
 	return (
 		<Menu>
@@ -13,13 +15,13 @@ export default function HeaderMenu() {
 					icon={<MdFileDownload />}
 					command={<span><Kbd>CTRL</Kbd> + <Kbd>S</Kbd></span>}
 				>
-					Експорт
+					{t('Header.export')}
 				</MenuItem>
 				<MenuItem
 					icon={<MdLink />}
 					onClick={shareLinkDisclosure.onOpen}
 				>
-					Поділитися посиланням
+					{t('Header.share')}
 				</MenuItem>
 				<ShareLinkModal {...shareLinkDisclosure} />
 				<MenuItem
@@ -27,7 +29,7 @@ export default function HeaderMenu() {
 					command={<span><Kbd>CTRL</Kbd> + <Kbd>P</Kbd></span>}
 					onClick={() => window.print()}
 				>
-					Друк
+					{t('Header.print')}
 				</MenuItem>
 			</MenuList>
 		</Menu>

@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^2.7.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@nikolovlazar/chakra-ui-prose": "^1.2.1",
     "@reduxjs/toolkit": "^1.9.5",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
@@ -21,11 +22,16 @@
     "eslint-config-next": "13.4.5",
     "framer-motion": "^10.12.16",
     "next": "^13.4.6",
+    "next-intl": "^2.14.6",
     "next-qrcode": "^2.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.9.0",
     "react-redux": "^8.1.0",
+    "remark": "^14.0.3",
+    "remark-extract-frontmatter": "^3.2.0",
+    "remark-frontmatter": "^4.0.1",
+    "remark-html": "^15.0.2",
     "typescript": "5.1.3"
   }
 }

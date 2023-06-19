@@ -26,6 +26,8 @@ export default function SideNav() {
 		<SideNavMobile />
 	) : (
 		<Box
+			h='100vh'
+			minW={state.isOpen ? '250px': undefined}
 			maxH='100svh'
 			p={2}
 			overflow='auto'

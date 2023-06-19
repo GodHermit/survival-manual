@@ -1,13 +1,15 @@
 'use client';
 
 import { SettingsState, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
-import { Box, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, SimpleGrid, Stack, Switch, Tooltip } from '@chakra-ui/react';
+import { Box, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip } from '@chakra-ui/react';
+import { useTranslations } from 'next-intl';
 import { MdSettingsBackupRestore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function SettingsPage() {
 	const state = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
+	const t = useTranslations('Settings');
 
 	return (
 		<>
@@ -17,20 +19,20 @@ export default function SettingsPage() {
 				alignItems='baseline'
 				mb={4}
 			>
-				<Heading as='h1' mb={0}>Налаштування</Heading>
+				<Heading as='h1' mb={0}>{t('title')}</Heading>
 				<Tooltip
-					label='Скинути налаштування'
+					label={t('reset')}
 					placement='bottom-end'
 				>
 					<IconButton
-						aria-label='Скинути налаштування'
+						aria-label={t('reset')}
 						icon={<MdSettingsBackupRestore />}
 						onClick={() => dispatch(resetSettings())}
 					/>
 				</Tooltip>
 			</Box>
 			<FormControl mb={4}>
-				<FormLabel>Мова</FormLabel>
+				<FormLabel>{t('language')}</FormLabel>
 				<Select
 					value={state.language}
 					onChange={e => dispatch(setSettings({
@@ -42,42 +44,42 @@ export default function SettingsPage() {
 				</Select>
 			</FormControl>
 			<FormControl mb={4}>
-				<FormLabel>Тема</FormLabel>
+				<FormLabel>{t('colorMode.label')}</FormLabel>
 				<Select
 					value={state.colorMode}
 					onChange={e => dispatch(setSettings({
 						colorMode: e.target.value as SettingsState['colorMode']
 					}))}
 				>
-					<option value='light'>Світла</option>
-					<option value='dark'>Темна</option>
-					<option value='amoled'>Amoled</option>
-					<option value='system'>Системна</option>
+					<option value='light'>{t('colorMode.light')}</option>
+					<option value='dark'>{t('colorMode.dark')}</option>
+					<option value='amoled'>{t('colorMode.amoled')}</option>
+					<option value='system'>{t('colorMode.system')}</option>
 				</Select>
 			</FormControl>
 			<FormControl mb={4}>
-				<FormLabel>Розмір тексту</FormLabel>
+				<FormLabel>{t('fontSize.label')}</FormLabel>
 				<Select
 					value={state.fontSize}
 					onChange={e => dispatch(setSettings({
 						fontSize: e.target.value as SettingsState['fontSize']
 					}))}
 				>
-					<option value='base'>За замовчуванням</option>
-					<option value='sm'>Малий</option>
-					<option value='md'>Середній</option>
-					<option value='lg'>Великий</option>
-					<option value='xl'>Величезний</option>
+					<option value='base'>{t('fontSize.base')}</option>
+					<option value='sm'>{t('fontSize.sm')}</option>
+					<option value='md'>{t('fontSize.md')}</option>
+					<option value='lg'>{t('fontSize.lg')}</option>
+					<option value='xl'>{t('fontSize.xl')}</option>
 				</Select>
 			</FormControl>
-			<Heading as='h2' size='lg' mb={4} mt={6}>Доступ офлайн</Heading>
+			<Heading as='h2' size='lg' mb={4} mt={6}>{t('caching.heading')}</Heading>
 			<FormControl mb={4}>
 				<Box
 					display='flex'
 					justifyContent='space-between'
 					alignItems='center'
 				>
-					<FormLabel mb={0}>Зберігати статті</FormLabel>
+					<FormLabel mb={0}>{t('caching.label')}</FormLabel>
 					<Switch
 						isChecked={state.isCachingEnabled}
 						onChange={e => dispatch(setSettings({
@@ -87,22 +89,22 @@ export default function SettingsPage() {
 					/>
 				</Box>
 				{state.isCachingEnabled && (
-					<FormHelperText>Останнє оновлення: {new Date().toDateString()}</FormHelperText>
+					<FormHelperText>{t('caching.lastSync')}: {new Date().toDateString()}</FormHelperText>
 				)}
 			</FormControl>
 			<Stack pl={6} spacing={4}>
 				<FormControl
 					isDisabled={!state.isCachingEnabled}
 				>
-					<FormLabel>Мова</FormLabel>
+					<FormLabel>{t('caching.language.label')}</FormLabel>
 					<Select
 						value={state.cacheLanguages}
 						onChange={e => dispatch(setSettings({
 							cacheLanguages: e.target.value as SettingsState['cacheLanguages']
 						}))}
 					>
-						<option value='current'>Вибрана</option>
-						<option value='all'>Усі</option>
+						<option value='current'>{t('caching.language.selected')}</option>
+						<option value='all'>{t('caching.language.all')}</option>
 					</Select>
 				</FormControl>
 				<FormControl
@@ -111,7 +113,7 @@ export default function SettingsPage() {
 					alignItems='center'
 					isDisabled={!state.isCachingEnabled}
 				>
-					<FormLabel>Зберігати медіафайли</FormLabel>
+					<FormLabel>{t('caching.saveMedia')}</FormLabel>
 					<Switch
 						isChecked={state.isCachingMediaEnabled}
 						onChange={e => dispatch(setSettings({

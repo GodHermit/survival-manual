@@ -2,16 +2,16 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface SideNavState {
 	isOpen: boolean;
+	isLoading: boolean;
 }
 
 interface SideNavAction {
-	payload: Partial<{
-		isOpen: boolean;
-	}>;
+	payload: Partial<SideNavState>;
 }
 
 const initialState: SideNavState = {
 	isOpen: false,
+	isLoading: true,
 };
 
 export const sideNavSlice = createSlice({
@@ -20,7 +20,7 @@ export const sideNavSlice = createSlice({
 	reducers: {
 		setSideNav: (state, action: SideNavAction): SideNavState => ({
 			...state,
-			isOpen: action.payload?.isOpen ?? state.isOpen,
+			...action.payload,
 		}),
 		toggleSideNav: (state): SideNavState => ({
 			...state,

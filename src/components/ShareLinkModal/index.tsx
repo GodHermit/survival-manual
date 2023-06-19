@@ -4,25 +4,34 @@ import { useQRCode } from 'next-qrcode';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { MdLink } from 'react-icons/md';
+import { useTranslations } from 'next-intl';
 
 export default function ShareLinkModal(props: UseDisclosureReturn) {
 	const pathname = usePathname();
 	const { onCopy, value, setValue, hasCopied } = useClipboard('');
 	const toast = useToast();
 	const { SVG } = useQRCode();
+	const t = useTranslations('ShareLinkModal');
 
 	useEffect(() => {
 		setValue(getURL(pathname));
 	}, [pathname, setValue]);
 
-
 	const handleOnCopy = () => {
-		onCopy();
-		toast({
-			position: 'top',
-			status: 'success',
-			title: 'Посилання скопійовано',
-		});
+		try {
+			onCopy();
+			toast({
+				position: 'top',
+				status: 'success',
+				title: t('copySuccess'),
+			});
+		} catch (error) {
+			toast({
+				position: 'top',
+				status: 'error',
+				title: t('copyError'),
+			});
+		}
 	};
 
 	return (
@@ -36,7 +45,7 @@ export default function ShareLinkModal(props: UseDisclosureReturn) {
 		>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader>Поділитися посиланням</ModalHeader>
+				<ModalHeader>{t('title')}</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
 					<SVG text={value} />
@@ -55,9 +64,9 @@ export default function ShareLinkModal(props: UseDisclosureReturn) {
 						onClick={handleOnCopy}
 						isDisabled={hasCopied}
 					>
-						{hasCopied ? 'Скопійовано' : 'Копіювати'}
+						{hasCopied ? t('copyButtonSuccess') : t('copyButton')}
 					</Button>
-					<Button colorScheme='blue' onClick={props.onClose}>Готово</Button>
+					<Button colorScheme='blue' onClick={props.onClose}>{t('doneButton')}</Button>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

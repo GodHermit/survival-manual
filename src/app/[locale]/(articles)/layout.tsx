@@ -2,7 +2,7 @@
 
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
-import { Box, Grid, GridItem, useBreakpoint } from '@chakra-ui/react';
+import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
 
 export default function RootLayout({
 	children,
@@ -10,6 +10,8 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	const breakpoint = useBreakpoint();
+	const mainBg = useColorModeValue('gray.100', 'gray.700');
+	const mainContentBg = useColorModeValue('white', 'gray.800');
 
 	return (
 		<>
@@ -39,7 +41,7 @@ export default function RootLayout({
 				</GridItem>
 				<GridItem
 					area='main'
-					bg='gray.100'
+					bg={mainBg}
 					p={{
 						base: 4,
 						md: 8
@@ -47,7 +49,7 @@ export default function RootLayout({
 					overflow='auto'
 				>
 					<Box
-						bg='white'
+						bg={mainContentBg}
 						p={{
 							base: 4,
 							md: 8

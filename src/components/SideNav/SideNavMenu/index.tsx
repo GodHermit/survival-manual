@@ -1,15 +1,78 @@
-import { Divider, LinkBox, LinkOverlay, Text, VStack, Button, useBreakpoint, IconButton, Tooltip } from '@chakra-ui/react';
-import menuItems from './menu';
+import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { usePathname } from 'next/navigation';
+import { MdReport } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSideNavState, setSideNav } from '../sideNavSlice';
-import { usePathname } from 'next/navigation';
+import getSideNavMenuItems, { MenuItem } from './menu';
+import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
-export default function SideNavMenu() {
+export default function SideNavMenu(params: {locale: string}) {
+	const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 	const pathname = usePathname();
 	const state = useSelector(selectSideNavState);
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
+	const t = useTranslations();
+	const locale = useLocale();
+
+	useEffect(() => {
+		fetchMenuItems();		
+	}, []);
+
+	const fetchMenuItems = async () => {
+		// setSideNav({ isLoading: true });
+		try {
+			const menuItems = await getSideNavMenuItems(locale);
+			setMenuItems(menuItems);
+		} catch (error) {
+			setMenuItems([]);
+		}
+		dispatch(setSideNav({ isLoading: false }));
+	};
+
+	if (state.isLoading) {
+		return (
+			<VStack
+				h='100%'
+				p={4}
+				justifyContent='center'
+				spacing={2}
+			>
+				<Spinner />
+			</VStack>
+		)
+	}
+
+	if (menuItems.length === 0) {
+		return (
+			<VStack
+				h='100%'
+				p={4}
+				justifyContent='center'
+				spacing={2}
+			>
+				<Icon
+					as={MdReport}
+					mb={4}
+					fontSize='3xl'
+				/>
+				<Text
+					fontWeight={600}
+					color='gray.600'
+				>
+					{t('loadingError')}
+				</Text>
+				<Button
+					variant='ghost'
+					onClick={fetchMenuItems}
+				>
+					{t('tryAgain')}
+				</Button>
+			</VStack>
+		);
+	}
 
 	return (
 		<VStack spacing={1} alignItems='flex-start'>
@@ -67,7 +130,7 @@ export default function SideNavMenu() {
 								as={NextLink}
 								href={item.href || '/'}
 								key={`${breakpoint}-${i}`}
-								onClick={!isDesktop ? () => dispatch(setSideNav({isOpen: false})): undefined}
+								onClick={!isDesktop ? () => dispatch(setSideNav({ isOpen: false })) : undefined}
 								variant='ghost'
 								leftIcon={item.icon}
 								w='100%'
