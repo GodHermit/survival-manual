@@ -23,8 +23,8 @@
 	"SearchModal": {
 		"title": "Search",
 		"placeholder": "Search...",
-		"cancel": "Cancel"
-		
+		"cancel": "Cancel",
+		"noResults": "No results found"
 	},
 	"ShareLinkModal": {
 		"title": "Share link",

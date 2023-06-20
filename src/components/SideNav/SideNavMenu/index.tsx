@@ -1,38 +1,35 @@
+import { selectArticlesState } from '@/_helpers/articlesSlice';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
+import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
+import * as MdIcons from 'react-icons/md';
 import { MdReport } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSideNavState, setSideNav } from '../sideNavSlice';
-import getSideNavMenuItems, { MenuItem } from './menu';
-import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
 
-export default function SideNavMenu(params: {locale: string}) {
-	const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+export interface SideNavMenuItem {
+	label: string;
+	icon?: JSX.Element;
+	href?: string;
+	type?: 'divider' | 'groupName';
+}
+
+export default function SideNavMenu() {
 	const pathname = usePathname();
 	const state = useSelector(selectSideNavState);
+	const articlesState = useSelector(selectArticlesState);
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
 	const t = useTranslations();
-	const locale = useLocale();
 
-	useEffect(() => {
-		fetchMenuItems();		
-	}, []);
+	const menuItems: SideNavMenuItem[] = articlesState.articlesMetadata.map((article) => ({
+		label: article.name as string,
+		icon: <Icon as={MdIcons[article.icon]} />,
+		href: `${article.slug}`
+	}));
 
-	const fetchMenuItems = async () => {
-		// setSideNav({ isLoading: true });
-		try {
-			const menuItems = await getSideNavMenuItems(locale);
-			setMenuItems(menuItems);
-		} catch (error) {
-			setMenuItems([]);
-		}
-		dispatch(setSideNav({ isLoading: false }));
-	};
-
-	if (state.isLoading) {
+	if (articlesState.isLoading) {
 		return (
 			<VStack
 				h='100%'
@@ -66,7 +63,7 @@ export default function SideNavMenu(params: {locale: string}) {
 				</Text>
 				<Button
 					variant='ghost'
-					onClick={fetchMenuItems}
+					onClick={() => alert('TODO')} //TODO: Implement
 				>
 					{t('tryAgain')}
 				</Button>
