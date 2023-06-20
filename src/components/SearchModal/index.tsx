@@ -1,9 +1,10 @@
-import { Card, CardBody, CardHeader, HStack, Heading, IconButton, Input, InputGroup, InputLeftElement, LinkBox, LinkOverlay, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, UseDisclosureReturn, VStack } from '@chakra-ui/react';
+import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { Card, CardBody, CardHeader, HStack, Heading, IconButton, Input, InputGroup, InputLeftElement, LinkBox, LinkOverlay, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, Text, UseDisclosureReturn, VStack } from '@chakra-ui/react';
+import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
+import { useState } from 'react';
 import { MdClose, MdSearch } from 'react-icons/md';
-import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import { getArticles } from '@/_lib/articles';
+import { useSelector } from 'react-redux';
 
 interface SearchResults {
 	title: string;
@@ -13,24 +14,16 @@ interface SearchResults {
 
 export default function HeaderSearch(props: UseDisclosureReturn) {
 	const [search, setSearch] = useState('');
-	const [results, setResults] = useState<SearchResults[]>([]);
 	const t = useTranslations('SearchModal');
-	const locale = useLocale();
+	const articlesState = useSelector(selectArticlesState);
 
-	useEffect(() => {
-		fetchArticles();
-	}, []);
-
-	const fetchArticles = async () => {
-		const articles = await getArticles(locale);
-		setResults(articles
-			.slice(0, 5)
-			.map((article) => ({
-				title: article.metadata.name as string,
-				href: `/articles/${article.metadata.slug}`,
-				description: 'Test'
-			})));
-	};
+	const results: SearchResults[] = articlesState.articlesMetadata
+		.slice(0, 5)
+		.map((article) => ({
+			title: article.name as string,
+			href: `${article.slug}`,
+			description: 'Test'
+		}));
 
 	return (
 		<>
@@ -67,7 +60,12 @@ export default function HeaderSearch(props: UseDisclosureReturn) {
 					</ModalHeader>
 					<ModalBody pl={4} pr={4} pb={4}>
 						<VStack spacing={2}>
-							{results.map((item) => (
+							{results.length <= 0 && (
+								<Text as='b'>
+									{t('noResults')}
+								</Text>
+							)}
+							{results.length > 0 && results.map((item) => (
 								<LinkBox
 									as={Card}
 									key={item.href}

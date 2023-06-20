@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface SideNavState {
 	isOpen: boolean;
-	isLoading: boolean;
 }
 
 interface SideNavAction {
@@ -11,7 +10,6 @@ interface SideNavAction {
 
 const initialState: SideNavState = {
 	isOpen: false,
-	isLoading: true,
 };
 
 export const sideNavSlice = createSlice({

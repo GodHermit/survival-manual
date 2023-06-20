@@ -1,8 +1,12 @@
 'use client';
 
+import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { getArticlesMetadata } from '@/_lib/articles';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
 import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function RootLayout({
 	children,
@@ -12,6 +16,17 @@ export default function RootLayout({
 	const breakpoint = useBreakpoint();
 	const mainBg = useColorModeValue('gray.100', 'gray.700');
 	const mainContentBg = useColorModeValue('white', 'gray.800');
+	const articlesMetadata = useSelector(selectArticlesState);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		fetchArticlesMetadata();
+	}, []);
+
+	const fetchArticlesMetadata = async () => {
+		const articlesMetadata = await getArticlesMetadata();
+		// dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+	};
 
 	return (
 		<>
