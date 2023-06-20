@@ -1,6 +1,6 @@
 'use client';
 
-import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { selectArticlesState, setArticlesState } from '@/_helpers/articlesSlice';
 import { getArticlesMetadata } from '@/_lib/articles';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
@@ -25,7 +25,7 @@ export default function RootLayout({
 
 	const fetchArticlesMetadata = async () => {
 		const articlesMetadata = await getArticlesMetadata();
-		// dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+		dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
 	};
 
 	return (
