@@ -8,7 +8,6 @@ export interface SettingsState {
 	isCachingEnabled: boolean;
 	isCachingMediaEnabled: boolean;
 	cacheLanguages: 'current' | 'all';
-
 }
 
 interface SettingsAction {
@@ -32,7 +31,6 @@ export const settingsSlice = createSlice({
 	initialState,
 	reducers: {
 		setSettings: (state, action: SettingsAction): SettingsState => {
-			//TODO: save to local storage
 			return { ...state, ...action.payload };
 		},
 		resetSettings: (state): SettingsState => {
