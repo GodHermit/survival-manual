@@ -60,7 +60,7 @@ export async function getArticles(locale: string = 'en') {
 	return articles;
 }
 
-export async function getArticlesMetadata(locale: string = 'en'): Promise<ArticleMetadata[]> {
+export async function getArticlesMetadata(locale: string = 'en') {
 	const dirPath = await path.join(process.cwd(), `/public/wiki/${locale}/`);
 	if (!await fs.existsSync(dirPath)) {
 		return [];

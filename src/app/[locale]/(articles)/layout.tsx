@@ -1,12 +1,13 @@
 'use client';
 
-import { selectArticlesState, setArticlesState } from '@/_helpers/articlesSlice';
-import { getArticlesMetadata } from '@/_lib/articles';
+import { ArticleMetadata, setArticlesState } from '@/_helpers/articlesSlice';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
 import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
+import axios from 'axios';
+import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function RootLayout({
 	children,
@@ -16,16 +17,24 @@ export default function RootLayout({
 	const breakpoint = useBreakpoint();
 	const mainBg = useColorModeValue('gray.100', 'gray.700');
 	const mainContentBg = useColorModeValue('white', 'gray.800');
-	const articlesMetadata = useSelector(selectArticlesState);
 	const dispatch = useDispatch();
+	const locale = useLocale();
 
 	useEffect(() => {
 		fetchArticlesMetadata();
 	}, []);
 
 	const fetchArticlesMetadata = async () => {
-		const articlesMetadata = await getArticlesMetadata();
-		dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+		try {
+			const articlesMetadata = await axios.post('/api/articles', {
+				locale,
+				metadataOnly: true
+			}).then(res => res.data) as ArticleMetadata[];
+
+			dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+		} catch (error) {
+			dispatch(setArticlesState({ articlesMetadata: [], isLoading: false }));
+		}
 	};
 
 	return (
