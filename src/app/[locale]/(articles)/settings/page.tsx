@@ -1,15 +1,40 @@
 'use client';
 
-import { SettingsState, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
-import { Box, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip } from '@chakra-ui/react';
-import { useTranslations } from 'next-intl';
+import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
+import { Box, Button, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip } from '@chakra-ui/react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, useEffect } from 'react';
 import { MdSettingsBackupRestore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function SettingsPage() {
 	const state = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
+	const locale = useLocale();
 	const t = useTranslations('Settings');
+	const tGlobal = useTranslations();
+	const router = useRouter();
+
+	const handleReset = () => {
+		router.push(`/${initialSettings.language}/settings`);
+		dispatch(resetSettings());
+	};
+
+	const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		dispatch(setSettings({
+			language: e.target.value,
+			isLanguageChanging: true
+		}));
+
+		router.push(`/${e.target.value}/settings`);
+	};
+
+	useEffect(() => {
+		dispatch(setSettings({
+			isLanguageChanging: false
+		}));
+	}, [dispatch, locale]);
 
 	return (
 		<>
@@ -27,18 +52,20 @@ export default function SettingsPage() {
 					<IconButton
 						aria-label={t('reset')}
 						icon={<MdSettingsBackupRestore />}
-						onClick={() => dispatch(resetSettings())}
+						onClick={handleReset}
 					/>
 				</Tooltip>
 			</Box>
-			<FormControl mb={4}>
+			<FormControl
+				mb={4}
+				isDisabled={state.isLanguageChanging}
+			>
 				<FormLabel>{t('language')}</FormLabel>
 				<Select
-					value={state.language}
-					onChange={e => dispatch(setSettings({
-						language: e.target.value
-					}))}
+					value={state.isLanguageChanging ? 'loading' : locale}
+					onChange={handleLanguageChange}
 				>
+					<option value='loading' hidden disabled>{tGlobal('loading')}...</option>
 					<option value='en'>English</option>
 					<option value='uk'>Українська</option>
 				</Select>

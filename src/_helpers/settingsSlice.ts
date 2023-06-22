@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export interface SettingsState {
 	language: string;
+	isLanguageChanging: boolean;
 	colorMode: 'light' | 'dark' | 'amoled' | 'system';
 	fontSize: 'base' | 'xs' | 'ms' | 'lg' | 'xl';
 	isCachingEnabled: boolean;
@@ -15,13 +16,16 @@ interface SettingsAction {
 }
 
 const initialState: SettingsState = {
-	language: 'uk',
+	language: 'en',
+	isLanguageChanging: false,
 	colorMode: 'system',
 	fontSize: 'base',
 	isCachingEnabled: false,
 	isCachingMediaEnabled: false,
 	cacheLanguages: 'current'
 };
+
+export const initialSettings = initialState;
 
 export const settingsSlice = createSlice({
 	name: 'settings',

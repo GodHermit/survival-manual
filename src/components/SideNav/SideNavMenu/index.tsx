@@ -1,7 +1,7 @@
 import { selectArticlesState } from '@/_helpers/articlesSlice';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
+import NextLink from 'next-intl/link';
 import { usePathname } from 'next/navigation';
 import * as MdIcons from 'react-icons/md';
 import { MdReport } from 'react-icons/md';

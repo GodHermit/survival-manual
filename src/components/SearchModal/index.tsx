@@ -1,7 +1,7 @@
 import { selectArticlesState } from '@/_helpers/articlesSlice';
 import { Card, CardBody, CardHeader, HStack, Heading, IconButton, Input, InputGroup, InputLeftElement, LinkBox, LinkOverlay, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, Text, UseDisclosureReturn, VStack } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
+import NextLink from 'next-intl/link';
 import { useState } from 'react';
 import { MdClose, MdSearch } from 'react-icons/md';
 import { useSelector } from 'react-redux';
