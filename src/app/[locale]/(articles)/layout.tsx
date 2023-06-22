@@ -8,7 +8,7 @@ import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default async function RootLayout({
+export default function ArticlesLayout({
 	children,
 }: {
 	children: React.ReactNode
