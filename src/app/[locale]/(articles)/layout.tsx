@@ -1,15 +1,14 @@
 'use client';
 
-import { ArticleMetadata, setArticlesState } from '@/_helpers/articlesSlice';
+import { fetchArticlesMetadata, setArticlesState } from '@/_helpers/articlesSlice';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
 import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
-import axios from 'axios';
 import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
@@ -21,21 +20,11 @@ export default function RootLayout({
 	const locale = useLocale();
 
 	useEffect(() => {
-		fetchArticlesMetadata();
-	}, []);
-
-	const fetchArticlesMetadata = async () => {
-		try {
-			const articlesMetadata = await axios.post('/api/articles', {
-				locale,
-				metadataOnly: true
-			}).then(res => res.data) as ArticleMetadata[];
-
-			dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
-		} catch (error) {
-			dispatch(setArticlesState({ articlesMetadata: [], isLoading: false }));
-		}
-	};
+		fetchArticlesMetadata(locale)
+			.then(articlesMetadata => {
+				dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+			});
+	}, [locale, dispatch]);
 
 	return (
 		<>
