@@ -8,6 +8,16 @@ import { ChangeEvent, useEffect } from 'react';
 import { MdSettingsBackupRestore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
+function drySettings(settings: SettingsState) {
+	return Object.fromEntries(
+		Object
+			.entries(settings)
+			.filter(
+				([key]) => !(key.startsWith('is') && key.endsWith('Changing'))
+			)
+	);
+}
+
 export default function SettingsPage() {
 	const state = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
@@ -17,9 +27,27 @@ export default function SettingsPage() {
 	const { setColorMode } = useColorMode()
 	const router = useRouter();
 
+	/**
+	 * Check if settings were modified.
+	 * Ignore `is*Changing` properties.
+	 */
+	const isSettingsModified = JSON.stringify(drySettings(state)) !== JSON.stringify(drySettings(initialSettings));
+
 	const handleReset = () => {
-		router.push(`/${initialSettings.language}/settings`);
+		if (!isSettingsModified) {
+			return;
+		}
+		
 		dispatch(resetSettings());
+
+		router.push(`/${initialSettings.language}/settings`);
+		setColorMode(initialSettings.colorMode);
+
+		dispatch(setSettings({
+			isLanguageChanging: false,
+			isColorModeChanging: false,
+			isFontSizeChanging: false
+		}));
 	};
 
 	const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -77,11 +105,13 @@ export default function SettingsPage() {
 				<Tooltip
 					label={t('reset')}
 					placement='bottom-end'
+					isDisabled={!isSettingsModified}
 				>
 					<IconButton
 						aria-label={t('reset')}
 						icon={<MdSettingsBackupRestore />}
 						onClick={handleReset}
+						isDisabled={!isSettingsModified}
 					/>
 				</Tooltip>
 			</Box>
