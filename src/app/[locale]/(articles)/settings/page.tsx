@@ -1,10 +1,12 @@
 'use client';
 
 import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
+import { Locale } from '@/_lib/messages';
 import { Box, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip, useColorMode } from '@chakra-ui/react';
+import axios from 'axios';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { MdSettingsBackupRestore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -19,6 +21,7 @@ function drySettings(settings: SettingsState) {
 }
 
 export default function SettingsPage() {
+	const [locales, setLocales] = useState<Locale[]>([]);
 	const state = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
 	const locale = useLocale();
@@ -37,7 +40,7 @@ export default function SettingsPage() {
 		if (!isSettingsModified) {
 			return;
 		}
-		
+
 		dispatch(resetSettings());
 
 		router.push(`/${initialSettings.language}/settings`);
@@ -49,6 +52,12 @@ export default function SettingsPage() {
 			isFontSizeChanging: false
 		}));
 	};
+
+	useEffect(() => {
+		axios.get('/api/locales').then(({ data }) => {
+			setLocales(data);
+		});
+	}, []);
 
 	const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
 		dispatch(setSettings({
@@ -117,16 +126,22 @@ export default function SettingsPage() {
 			</Box>
 			<FormControl
 				mb={4}
-				isDisabled={state.isLanguageChanging}
+				isDisabled={state.isLanguageChanging || locales.length <= 0}
 			>
 				<FormLabel>{t('language')}</FormLabel>
 				<Select
-					value={state.isLanguageChanging ? 'loading' : locale}
+					value={state.isLanguageChanging || locales.length <= 0 ? 'loading' : locale}
 					onChange={handleLanguageChange}
 				>
 					<option value='loading' hidden disabled>{tGlobal('loading')}...</option>
-					<option value='en'>English</option>
-					<option value='uk'>Українська</option>
+					{locales.map((locale) => (
+						<option
+							key={locale.code}
+							value={locale.code}
+						>
+							{locale.name}
+						</option>
+					))}
 				</Select>
 			</FormControl>
 			<FormControl
