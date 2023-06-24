@@ -1,7 +1,7 @@
 'use client';
 
 import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
-import { Box, Button, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip, useColorMode } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect } from 'react';
@@ -14,6 +14,7 @@ export default function SettingsPage() {
 	const locale = useLocale();
 	const t = useTranslations('Settings');
 	const tGlobal = useTranslations();
+	const { setColorMode } = useColorMode()
 	const router = useRouter();
 
 	const handleReset = () => {
@@ -35,6 +36,21 @@ export default function SettingsPage() {
 			isLanguageChanging: false
 		}));
 	}, [dispatch, locale]);
+
+	const handleColorModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		dispatch(setSettings({
+			colorMode: e.target.value as SettingsState['colorMode'],
+			isColorModeChanging: true
+		}));
+
+		setColorMode(e.target.value as SettingsState['colorMode']);
+	};
+
+	useEffect(() => {
+		dispatch(setSettings({
+			isColorModeChanging: false
+		}));
+	}, [dispatch, state.colorMode]);
 
 	return (
 		<>
@@ -70,17 +86,18 @@ export default function SettingsPage() {
 					<option value='uk'>Українська</option>
 				</Select>
 			</FormControl>
-			<FormControl mb={4}>
+			<FormControl
+				mb={4}
+				isDisabled={state.isColorModeChanging}
+			>
 				<FormLabel>{t('colorMode.label')}</FormLabel>
 				<Select
-					value={state.colorMode}
-					onChange={e => dispatch(setSettings({
-						colorMode: e.target.value as SettingsState['colorMode']
-					}))}
+					value={state.isColorModeChanging ? 'loading' : state.colorMode}
+					onChange={handleColorModeChange}
 				>
+					<option value='loading' hidden disabled>{tGlobal('loading')}...</option>
 					<option value='light'>{t('colorMode.light')}</option>
 					<option value='dark'>{t('colorMode.dark')}</option>
-					<option value='amoled'>{t('colorMode.amoled')}</option>
 					<option value='system'>{t('colorMode.system')}</option>
 				</Select>
 			</FormControl>

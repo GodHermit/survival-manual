@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface SettingsState {
 	language: string;
 	isLanguageChanging: boolean;
-	colorMode: 'light' | 'dark' | 'amoled' | 'system';
+	colorMode: 'light' | 'dark' | 'system';
+	isColorModeChanging: boolean;
 	fontSize: 'base' | 'xs' | 'ms' | 'lg' | 'xl';
 	isCachingEnabled: boolean;
 	isCachingMediaEnabled: boolean;
@@ -14,27 +15,26 @@ interface SettingsAction {
 	payload: Partial<SettingsState>;
 }
 
-const initialState: SettingsState = {
+export const initialSettings: SettingsState = {
 	language: 'en',
 	isLanguageChanging: false,
 	colorMode: 'system',
+	isColorModeChanging: true,
 	fontSize: 'base',
 	isCachingEnabled: false,
 	isCachingMediaEnabled: false,
 	cacheLanguages: 'current'
 };
 
-export const initialSettings = initialState;
-
 export const settingsSlice = createSlice({
 	name: 'settings',
-	initialState,
+	initialState: initialSettings,
 	reducers: {
 		setSettings: (state, action: SettingsAction): SettingsState => {
 			return { ...state, ...action.payload };
 		},
 		resetSettings: (state): SettingsState => {
-			return { ...state, ...initialState };
+			return { ...state, ...initialSettings };
 		}
 	}
 });
