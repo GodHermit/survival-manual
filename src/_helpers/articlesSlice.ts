@@ -16,14 +16,14 @@ interface SettingsAction {
 	payload: Partial<ArticlesState>;
 }
 
-const initialState: ArticlesState = {
+export const initialArticlesState: ArticlesState = {
 	isLoading: true,
 	articlesMetadata: []
 };
 
 export const articlesSlice = createSlice({
 	name: 'articles',
-	initialState,
+	initialState: initialArticlesState,
 	reducers: {
 		setArticlesState: (state, action: SettingsAction): ArticlesState => {
 			return { ...state, ...action.payload };

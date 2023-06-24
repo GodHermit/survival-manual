@@ -1,7 +1,15 @@
-import articlesSlice from '@/_helpers/articlesSlice';
+'use client';
+
+import articlesSlice, { initialArticlesState } from '@/_helpers/articlesSlice';
 import settingsSlice, { initialSettings } from '@/_helpers/settingsSlice';
-import sideNavSlice from '@/components/SideNav/sideNavSlice';
+import sideNavSlice, { initialSideNavState } from '@/components/SideNav/sideNavSlice';
 import { configureStore } from '@reduxjs/toolkit';
+
+export const preloadedState = {
+	sideNav: initialSideNavState,
+	settings: initialSettings,
+	articles: initialArticlesState
+}
 
 const store = configureStore({
 	reducer: {
@@ -12,7 +20,7 @@ const store = configureStore({
 	preloadedState: {
 		settings: {
 			...initialSettings,
-			...JSON.parse(localStorage.getItem('settings') || '{}')
+			...JSON.parse(typeof window !== 'undefined' && localStorage.getItem('settings') || '{}')
 		}
 	}
 });

@@ -8,13 +8,13 @@ interface SideNavAction {
 	payload: Partial<SideNavState>;
 }
 
-const initialState: SideNavState = {
+export const initialSideNavState: SideNavState = {
 	isOpen: false,
 };
 
 export const sideNavSlice = createSlice({
 	name: 'sideNav',
-	initialState,
+	initialState: initialSideNavState,
 	reducers: {
 		setSideNav: (state, action: SideNavAction): SideNavState => ({
 			...state,
