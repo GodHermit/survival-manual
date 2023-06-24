@@ -5,7 +5,8 @@ export interface SettingsState {
 	isLanguageChanging: boolean;
 	colorMode: 'light' | 'dark' | 'system';
 	isColorModeChanging: boolean;
-	fontSize: 'base' | 'xs' | 'ms' | 'lg' | 'xl';
+	fontSize: 'base' | 'xs' | 'md' | 'lg' | 'xl';
+	isFontSizeChanging: boolean;
 	isCachingEnabled: boolean;
 	isCachingMediaEnabled: boolean;
 	cacheLanguages: 'current' | 'all';
@@ -21,6 +22,7 @@ export const initialSettings: SettingsState = {
 	colorMode: 'system',
 	isColorModeChanging: true,
 	fontSize: 'base',
+	isFontSizeChanging: true,
 	isCachingEnabled: false,
 	isCachingMediaEnabled: false,
 	cacheLanguages: 'current'

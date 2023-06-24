@@ -1,12 +1,13 @@
 'use client';
 
 import { fetchArticlesMetadata, setArticlesState } from '@/_helpers/articlesSlice';
+import { selectSettingsState } from '@/_helpers/settingsSlice';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
 import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
 import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ArticlesLayout({
 	children,
@@ -16,6 +17,7 @@ export default function ArticlesLayout({
 	const breakpoint = useBreakpoint();
 	const mainBg = useColorModeValue('gray.100', 'gray.700');
 	const mainContentBg = useColorModeValue('white', 'gray.800');
+	const settings = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
 	const locale = useLocale();
 
@@ -28,6 +30,11 @@ export default function ArticlesLayout({
 
 	return (
 		<>
+			<style jsx global>{`
+				html, body {
+					font-size: var(--chakra-fontSizes-${settings.fontSize == 'base' ? 'md' : settings.fontSize});
+				}
+			`}</style>
 			{(breakpoint === 'base' || breakpoint === 'sm') && (
 				<SideNav />
 			)}

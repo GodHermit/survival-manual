@@ -14,7 +14,7 @@ export function Providers({
 }) {
 	return (
 		<>
-			<ColorModeScript storageKey='settings.colorMode'/>
+			<ColorModeScript storageKey='settings.colorMode' />
 			<Provider store={store} serverState={preloadedState}>
 				<CacheProvider>
 					<ChakraProvider theme={theme} colorModeManager={customStorageManager}>

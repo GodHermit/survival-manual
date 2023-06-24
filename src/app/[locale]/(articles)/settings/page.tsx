@@ -1,7 +1,7 @@
 'use client';
 
 import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
-import { Box, Button, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip, useColorMode } from '@chakra-ui/react';
+import { Box, FormControl, FormHelperText, FormLabel, Heading, IconButton, Select, Stack, Switch, Tooltip, useColorMode } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect } from 'react';
@@ -52,6 +52,19 @@ export default function SettingsPage() {
 		}));
 	}, [dispatch, state.colorMode]);
 
+	const handleFontSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		dispatch(setSettings({
+			fontSize: e.target.value as SettingsState['fontSize'],
+			isFontSizeChanging: true
+		}));
+	};
+
+	useEffect(() => {
+		dispatch(setSettings({
+			isFontSizeChanging: false
+		}));
+	}, [dispatch, state.fontSize]);
+
 	return (
 		<>
 			<Box
@@ -101,14 +114,16 @@ export default function SettingsPage() {
 					<option value='system'>{t('colorMode.system')}</option>
 				</Select>
 			</FormControl>
-			<FormControl mb={4}>
+			<FormControl
+				mb={4}
+				isDisabled={state.isFontSizeChanging}
+			>
 				<FormLabel>{t('fontSize.label')}</FormLabel>
 				<Select
-					value={state.fontSize}
-					onChange={e => dispatch(setSettings({
-						fontSize: e.target.value as SettingsState['fontSize']
-					}))}
+					value={state.isFontSizeChanging ? 'loading' : state.fontSize}
+					onChange={handleFontSizeChange}
 				>
+					<option value='loading' hidden disabled>{tGlobal('loading')}...</option>
 					<option value='base'>{t('fontSize.base')}</option>
 					<option value='sm'>{t('fontSize.sm')}</option>
 					<option value='md'>{t('fontSize.md')}</option>
