@@ -22,7 +22,6 @@ export default function DeleteCacheDialog(props: UseDisclosureReturn) {
 		if (props.isOpen) {
 			startCountdown();
 		} else {
-			//FIXME: countdown stops after ~4 seconds
 			stopCountdown();
 			resetCountdown();
 		}
