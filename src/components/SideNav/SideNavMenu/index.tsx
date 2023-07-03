@@ -1,7 +1,7 @@
 import { selectArticlesState } from '@/_helpers/articlesSlice';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
+import NextLink from 'next-intl/link';
 import { usePathname } from 'next/navigation';
 import * as MdIcons from 'react-icons/md';
 import { MdReport } from 'react-icons/md';
@@ -22,10 +22,11 @@ export default function SideNavMenu() {
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
 	const t = useTranslations();
+	const MdIconsEntries = Object.fromEntries(Object.entries(MdIcons).map(([key, value]) => [key, value]));
 
 	const menuItems: SideNavMenuItem[] = articlesState.articlesMetadata.map((article) => ({
 		label: article.name as string,
-		icon: <Icon as={MdIcons[article.icon]} />,
+		icon: <Icon as={MdIconsEntries[article.icon]} />,
 		href: `${article.slug}`
 	}));
 

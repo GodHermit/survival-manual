@@ -1,38 +1,46 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface SettingsState {
-	language: string;
-	colorMode: 'light' | 'dark' | 'amoled' | 'system';
-	fontSize: 'base' | 'xs' | 'ms' | 'lg' | 'xl';
+	locale: string;
+	isLanguageChanging: boolean;
+	colorMode: 'light' | 'dark' | 'system';
+	isColorModeChanging: boolean;
+	fontSize: 'base' | 'xs' | 'md' | 'lg' | 'xl';
+	isFontSizeChanging: boolean;
 	isCachingEnabled: boolean;
 	isCachingMediaEnabled: boolean;
-	cacheLanguages: 'current' | 'all';
-
+	cacheLocales: 'current' | 'all';
+	cacheLastSyncTimestamp?: number;
+	isCacheChanging: boolean;
 }
 
 interface SettingsAction {
 	payload: Partial<SettingsState>;
 }
 
-const initialState: SettingsState = {
-	language: 'uk',
+export const initialSettings: SettingsState = {
+	locale: 'en',
+	isLanguageChanging: false,
 	colorMode: 'system',
+	isColorModeChanging: true,
 	fontSize: 'base',
+	isFontSizeChanging: true,
 	isCachingEnabled: false,
 	isCachingMediaEnabled: false,
-	cacheLanguages: 'current'
+	cacheLocales: 'current',
+	cacheLastSyncTimestamp: undefined,
+	isCacheChanging: false,
 };
 
 export const settingsSlice = createSlice({
 	name: 'settings',
-	initialState,
+	initialState: initialSettings,
 	reducers: {
 		setSettings: (state, action: SettingsAction): SettingsState => {
-			//TODO: save to local storage
 			return { ...state, ...action.payload };
 		},
 		resetSettings: (state): SettingsState => {
-			return { ...state, ...initialState };
+			return { ...state, ...initialSettings };
 		}
 	}
 });

@@ -1,12 +1,14 @@
 'use client';
 
 import { fetchArticlesMetadata, setArticlesState } from '@/_helpers/articlesSlice';
+import { selectSettingsState } from '@/_helpers/settingsSlice';
+import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
-import { Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
+import { Alert, AlertIcon, AlertTitle, Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';
 import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ArticlesLayout({
 	children,
@@ -16,8 +18,10 @@ export default function ArticlesLayout({
 	const breakpoint = useBreakpoint();
 	const mainBg = useColorModeValue('gray.100', 'gray.700');
 	const mainContentBg = useColorModeValue('white', 'gray.800');
+	const settings = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
 	const locale = useLocale();
+	const isOnline = useNetworkStatus();
 
 	useEffect(() => {
 		fetchArticlesMetadata(locale)
@@ -28,6 +32,11 @@ export default function ArticlesLayout({
 
 	return (
 		<>
+			<style jsx global>{`
+				html, body {
+					font-size: var(--chakra-fontSizes-${settings.fontSize == 'base' ? 'md' : settings.fontSize});
+				}
+			`}</style>
 			{(breakpoint === 'base' || breakpoint === 'sm') && (
 				<SideNav />
 			)}
@@ -53,14 +62,35 @@ export default function ArticlesLayout({
 					<Header />
 				</GridItem>
 				<GridItem
+					position='relative'
 					area='main'
 					bg={mainBg}
+					borderTopLeftRadius={{
+						base: 0,
+						md: 'md'
+					}}
 					p={{
 						base: 4,
 						md: 8
 					}}
+					pt={!isOnline ? {
+						base: 'calc(var(--chakra-space-4) + 48px)',
+						md: 'calc(var(--chakra-space-8) + 48px)'
+					} : undefined}
 					overflow='auto'
 				>
+					{!isOnline && (
+						<Alert
+							status='error'
+							variant='solid'
+							position='absolute'
+							top={0}
+							left={0}
+						>
+							<AlertIcon />
+							<AlertTitle>Offline!</AlertTitle>
+						</Alert>
+					)}
 					<Box
 						bg={mainContentBg}
 						p={{

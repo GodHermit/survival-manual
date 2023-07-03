@@ -13,7 +13,7 @@ export default function HeaderMenu() {
 			<MenuList>
 				<MenuItem
 					icon={<MdFileDownload />}
-					command={<span><Kbd>CTRL</Kbd> + <Kbd>S</Kbd></span>}
+					command='CTRL + S'
 				>
 					{t('Header.export')}
 				</MenuItem>
@@ -26,7 +26,7 @@ export default function HeaderMenu() {
 				<ShareLinkModal {...shareLinkDisclosure} />
 				<MenuItem
 					icon={<MdPrint />}
-					command={<span><Kbd>CTRL</Kbd> + <Kbd>P</Kbd></span>}
+					command='CTRL + P'
 					onClick={() => window.print()}
 				>
 					{t('Header.print')}
