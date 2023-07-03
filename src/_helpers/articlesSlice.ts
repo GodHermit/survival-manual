@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 
 export interface ArticleMetadata {
 	name: string;
@@ -31,18 +30,25 @@ export const articlesSlice = createSlice({
 	}
 });
 
-export const fetchArticlesMetadata = async (locale: string) => {
+export const fetchArticlesMetadata = async (locale: string): Promise<ArticleMetadata[]> => {
 	try {
-		const articlesMetadata = await axios.post('/api/articles', {
-			locale,
-			metadataOnly: true
-		}).then(res => res.data) as ArticleMetadata[];
+		const res = await fetch(`/api/articles?locale=${locale}&metadataOnly=true`, {
+			headers: {
+				'Accept': 'application/json'
+			}
+		});
+
+		if (!res.ok) {
+			throw new Error(res.statusText);
+		}
+
+		const articlesMetadata = await res.json();
 
 		return articlesMetadata;
 	} catch (error) {
 		return [];
 	}
-}
+};
 
 export const { setArticlesState } = articlesSlice.actions;
 

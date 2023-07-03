@@ -4,11 +4,13 @@ export default createMiddleware({
 	// A list of all locales that are supported
 	locales: ['en', 'uk'],
 
-	// If this locale is matched, pathnames work without a prefix (e.g. `/about`)
-	defaultLocale: 'en'
+	defaultLocale: 'en',
+
+	// Include a prefix for the default locale as well
+	localePrefix: 'always'
 });
 
 export const config = {
 	// Skip all paths that should not be internationalized
-	matcher: ['/((?!api|_next|.*\\..*).*)']
+	matcher: ['/((?!api|_next|wiki|.*\\..*).*)']
 };

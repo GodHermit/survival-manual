@@ -62,8 +62,22 @@
 				"selected": "Selected",
 				"all": "All"
 			},
-			"saveMedia": "Save Media"
+			"saveMedia": "Save Media",
+			"onlineOnly": "Unavailable Offline",
+			"DeleteCacheDialog": {
+				"heading": "Delete cached data",
+				"text": "Are you sure you want to delete all cached data? This will remove all articles and media saved for offline use.",
+				"cancelButton": "Cancel",
+				"confirmButton": "Delete {seconds, plural, =0 {} other {(#)}}"
+			},
+			"UpdateCacheButton": {
+				"updateButton": "Update",
+				"willBeAvailableIn": "Will be available in {minutes, plural, =0 {a moment} =1 {# minute} other {# minutes}}"
+			}
 		}
-		
+	},
+	"Offline": {
+		"title": "Connect to the Internet",
+		"message": "You're offline. Check your connection."
 	}
 }

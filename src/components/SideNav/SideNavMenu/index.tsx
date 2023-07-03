@@ -22,10 +22,11 @@ export default function SideNavMenu() {
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
 	const t = useTranslations();
+	const MdIconsEntries = Object.fromEntries(Object.entries(MdIcons).map(([key, value]) => [key, value]));
 
 	const menuItems: SideNavMenuItem[] = articlesState.articlesMetadata.map((article) => ({
 		label: article.name as string,
-		icon: <Icon as={MdIcons[article.icon]} />,
+		icon: <Icon as={MdIconsEntries[article.icon]} />,
 		href: `${article.slug}`
 	}));
 
