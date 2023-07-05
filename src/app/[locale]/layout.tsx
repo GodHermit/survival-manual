@@ -41,7 +41,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 			],
 			apple: '/assets/apple-touch-icon.png'
 		},
-		manifest: '/assets/manifest.json',
+		manifest: `/manifest.json?locale=${locale}`,
 	};
 }
 
