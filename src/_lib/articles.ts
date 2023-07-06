@@ -1,6 +1,5 @@
 'use server';
 
-import { ArticleMetadata } from '@/_helpers/articlesSlice';
 import { notFound } from 'next/navigation';
 import path from 'path';
 import { remark } from 'remark';
@@ -21,104 +20,93 @@ const RESERVED_ARTICLE_NAMES = [
 	'settings',
 ];
 
-export async function getArticleByFilename(filename: string, locale: string = 'en') {
-	// If the article name is reserved, return 404
-	if (RESERVED_ARTICLE_NAMES.includes(filename)) {
-		return notFound();
-	}
-
-	const fullPath = await path.join(process.cwd(), `/public/wiki/${locale}/${filename}.md`);
-
-	if (!await fs.existsSync(fullPath)) {
-		return notFound();
-	}
-
-	const fileContents = fs.readFileSync(fullPath, 'utf8');
-
-	const processedContent = await remark()
-		.use(remarkFrontmatter, ['yaml'])
-		.use(remarkExtractFrontmatter, yaml)
-		.use(html)
-		.process(fileContents);
-
-	return {
-		metadata: processedContent.data,
-		contentHtml: processedContent.toString(),
-	};
-}
-
+/**
+ * Returns all articles for the specified locale from the public/wiki directory
+ * @param locale locale to get articles for (default: 'en')
+ * @returns array of articles
+ */
 export async function getArticles(locale: string = 'en') {
 	const dirPath = await path.join(process.cwd(), `/public/wiki/${locale}/`);
 	if (!await fs.existsSync(dirPath)) {
 		return [];
 	}
 
-	const files = await fs.readdirSync(dirPath);
+	const files = await fs.readdirSync(dirPath) // Get all files in the directory
+		.filter((file: string) => (
+			fs.statSync(path.join(dirPath, file)).isFile() // Get files only
+			&& file.endsWith(`.md`) // Get markdown files only
+			&& !new RegExp( // Ignore files with reserved names
+				RESERVED_ARTICLE_NAMES.map(name => `${name.toLowerCase()}`).join(`|`)
+			).test(file.toLowerCase())
+		))
+		.sort((a: string, b: string) => { // Sort files by number in the beginning of the filename
+			const aNumber = parseInt(a.split('.')[0]);
+			const bNumber = parseInt(b.split('.')[0]);
+
+			if (aNumber && bNumber) { // If both files have numbers in the beginning of the filename
+				return aNumber - bNumber; // Sort by number (ascending)
+			}
+
+			return 0; // Otherwise, don't sort
+		});
 
 	const articles = [];
 
 	for (const file of files) {
-		// Ignore reserved names
-		if (RESERVED_ARTICLE_NAMES.includes(path.basename(file, path.extname(file)))) {
-			continue;
-		}
-
-		if (file.endsWith(`.md`)) {
-			const fullPath = await path.join(dirPath, file);
-			const fileContents = fs.readFileSync(fullPath, 'utf8');
-			const processedContent = await remark()
-				.use(remarkFrontmatter, ['yaml'])
-				.use(remarkExtractFrontmatter, yaml)
-				.use(html)
-				.process(fileContents);
-			const metadata = processedContent.data;
-			const contentHtml = processedContent.toString();
-			articles.push({ metadata, contentHtml });
-		}
-	}
-
-	return articles;
-}
-
-export async function getArticlesMetadata(locale: string = 'en') {
-	const dirPath = await path.join(process.cwd(), `/public/wiki/${locale}/`);
-	if (!await fs.existsSync(dirPath)) {
-		return [];
-	}
-
-	const files = await fs.readdirSync(dirPath);
-
-	const articles: ArticleMetadata[] = [];
-
-	for (const file of files) {
-		// Ignore reserved names
-		if (RESERVED_ARTICLE_NAMES.includes(path.basename(file, path.extname(file)))) {
-			continue;
-		}
-
-		if (file.endsWith(`.md`)) {
-			const fullPath = await path.join(dirPath, file);
-			const fileContents = fs.readFileSync(fullPath, 'utf8');
-			const processedContent = await remark()
-				.use(remarkFrontmatter, ['yaml'])
-				.use(remarkExtractFrontmatter, yaml)
-				.use(html)
-				.process(fileContents);
-			const metadata: ArticleMetadata = {
-				name: processedContent.data.name as string,
-				icon: processedContent.data.icon as string,
-				slug: processedContent.data.slug as string,
-			};
-			articles.push(metadata);
-		}
+		const fullPath = await path.join(dirPath, file); // Get full path to the file
+		const fileContents = fs.readFileSync(fullPath, 'utf8'); // Read file contents
+		const processedContent = await remark() // Process markdown
+			.use(remarkFrontmatter, ['yaml']) // Extract frontmatter
+			.use(remarkExtractFrontmatter, yaml) // Parse frontmatter
+			.use(html) // Convert markdown to HTML
+			.process(fileContents); // Process file contents
+		const metadata = processedContent.data; // Get metadata
+		const contentHtml = processedContent.toString(); // Get HTML
+		articles.push({ metadata, contentHtml }); // Add article to the array
 	}
 
 	return articles;
 }
 
 /**
+ * Returns all articles metadata for the specified locale from the public/wiki directory
+ * @param locale locale to get articles metadata for (default: 'en')
+ * @returns array of articles metadata
+ */
+export async function getArticlesMetadata(locale: string = 'en') {
+	const articles = await getArticles(locale);
+
+	return articles
+		.map(article => article.metadata) // Get metadata
+		.filter(metadata => Object.values(metadata).length > 0); // Ignore articles without metadata
+}
+
+/**
+ * Searches for articles by the URL Slug
+ * @param slug URL Slug
+ * @param locale locale to search articles in (default: 'en')
+ * @returns article
+ */
+export async function getArticleBySlug(slug: string, locale: string = 'en') {
+	const articles = await getArticles(locale);
+
+	if (articles.length <= 0) {
+		return notFound();
+	}
+
+	const article = articles.find(article => article.metadata.slug === slug);
+
+	if (!article) {
+		return notFound();
+	}
+
+	return article;
+}
+
+/**
  * Returns all articles media files
- * @param {string} locale if specified, returns general media files + translated media files 
+ * @param {string} locale if specified, returns general media files + translated media files
+ * @returns array of media files
  */
 export async function getArticlesMedia(locale?: string) {
 	const publicURLToGeneralMediaFiles = `/wiki/assets/`; // URL to general media files
