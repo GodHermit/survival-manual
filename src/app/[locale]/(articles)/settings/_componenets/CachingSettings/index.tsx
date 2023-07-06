@@ -78,13 +78,24 @@ export default function CachingSettings() {
 	 */
 	const handleArticlesMediaCachingChange = (e: ChangeEvent<HTMLInputElement>) => {
 		dispatch(setSettings({
-			isCachingMediaEnabled: e.target.checked
+			isCachingMediaEnabled: e.target.checked,
+			isCacheChanging: true
 		}));
 
 		if (e.target.checked) {
-			setArticlesMediaCache(locale);
+			setArticlesMediaCache(locale)
+				.then(() => {
+					dispatch(setSettings({
+						isCacheChanging: false
+					}));
+				});
 		} else {
-			caches.delete(ARTICLES_MEDIA_CACHE);
+			caches.delete(ARTICLES_MEDIA_CACHE)
+				.then(() => {
+					dispatch(setSettings({
+						isCacheChanging: false
+					}));
+				});
 		}
 	}
 
