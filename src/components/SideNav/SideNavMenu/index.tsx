@@ -1,8 +1,10 @@
 import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { groupBy } from '@/_helpers/groupBy';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next-intl/link';
 import { usePathname } from 'next/navigation';
+import { createElement, useEffect, useState } from 'react';
 import * as MdIcons from 'react-icons/md';
 import { MdReport } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,20 +17,62 @@ export interface SideNavMenuItem {
 	type?: 'divider' | 'groupName';
 }
 
+/**
+ * Object with all Material Design icons from 'react-icons' library.
+ */
+const MdIconsEntries = Object.fromEntries(Object.entries(MdIcons).map(([key, value]) => [key, value]));
+
+/**
+ * Prepares menu items from articles metadata.
+ * @param articlesMetadata articles metadata
+ * @returns menu items
+ */
+function prepareMenuItems(articlesMetadata: any[]): SideNavMenuItem[] {
+	const menuItems: SideNavMenuItem[] = [];
+	const groups = groupBy(articlesMetadata, article => article.groupName);
+
+	var i = 0; // Counter for groups
+	groups.forEach((articles, groupName) => {
+		if (groupName) { // If groupName is not null
+			menuItems.push({ // Add groupName as a menu item
+				label: groupName,
+				type: 'groupName'
+			});
+		}
+
+		articles.forEach(article => { // Add articles as menu items
+			menuItems.push({
+				label: article.name as string,
+				icon: article.icon ? createElement(MdIconsEntries[article.icon]) : undefined,
+				href: `${article.slug}`
+			});
+		});
+
+		if (i < groups.size - 1) { // If it's not the last group
+			menuItems.push({ // Add divider
+				label: '',
+				type: 'divider'
+			});
+		}
+
+		i++; // Increment counter
+	});
+
+	return menuItems;
+}
+
 export default function SideNavMenu() {
+	const [menuItems, setMenuItems] = useState<SideNavMenuItem[]>([]);
 	const pathname = usePathname();
 	const state = useSelector(selectSideNavState);
 	const articlesState = useSelector(selectArticlesState);
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
 	const t = useTranslations();
-	const MdIconsEntries = Object.fromEntries(Object.entries(MdIcons).map(([key, value]) => [key, value]));
 
-	const menuItems: SideNavMenuItem[] = articlesState.articlesMetadata.map((article) => ({
-		label: article.name as string,
-		icon: <Icon as={MdIconsEntries[article.icon]} />,
-		href: `${article.slug}`
-	}));
+	useEffect(() => {
+		setMenuItems(prepareMenuItems(articlesState.articlesMetadata));
+	}, [articlesState.articlesMetadata]);
 
 	if (articlesState.isLoading) {
 		return (
