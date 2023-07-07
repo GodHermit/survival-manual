@@ -1,7 +1,7 @@
-import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { fetchArticlesMetadata, selectArticlesState, setArticlesState } from '@/_helpers/articlesSlice';
 import { groupBy } from '@/_helpers/groupBy';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import NextLink from 'next-intl/link';
 import { usePathname } from 'next/navigation';
 import { createElement, useEffect, useState } from 'react';
@@ -69,10 +69,19 @@ export default function SideNavMenu() {
 	const dispatch = useDispatch();
 	const breakpoint = useBreakpoint({ ssr: false });
 	const t = useTranslations();
+	const locale = useLocale();
 
 	useEffect(() => {
 		setMenuItems(prepareMenuItems(articlesState.articlesMetadata));
 	}, [articlesState.articlesMetadata]);
+
+	const handleTryAgain = () => {
+		dispatch(setArticlesState({ isLoading: true }));
+		fetchArticlesMetadata(locale)
+			.then(articlesMetadata => {
+				dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
+			});
+	};
 
 	if (articlesState.isLoading) {
 		return (
@@ -108,7 +117,7 @@ export default function SideNavMenu() {
 				</Text>
 				<Button
 					variant='ghost'
-					onClick={() => alert('TODO')} //TODO: Implement
+					onClick={handleTryAgain}
 				>
 					{t('tryAgain')}
 				</Button>

@@ -24,6 +24,7 @@ export default function ArticlesLayout({
 	const isOnline = useNetworkStatus();
 
 	useEffect(() => {
+		dispatch(setArticlesState({ isLoading: true }));
 		fetchArticlesMetadata(locale)
 			.then(articlesMetadata => {
 				dispatch(setArticlesState({ articlesMetadata, isLoading: false }));
