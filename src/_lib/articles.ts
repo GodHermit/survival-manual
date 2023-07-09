@@ -1,12 +1,12 @@
 'use server';
 
+import { locales as allLocales } from '@/middleware';
 import { notFound } from 'next/navigation';
 import path from 'path';
 import { remark } from 'remark';
 import remarkExtractFrontmatter from "remark-extract-frontmatter";
 import remarkFrontmatter from 'remark-frontmatter';
 import html from 'remark-html';
-import { getLocales } from './messages';
 
 const fs = require('fs');
 const yaml = require('yaml').parse;
@@ -132,7 +132,7 @@ export async function getArticlesMedia(locale?: string) {
 
 	let locales = [locale]; // Array of locales
 	if (locale === 'everyLocale') { // If locale is 'everyLocale', return media files for every locale
-		locales = (await getLocales()).map(locale => locale.code);
+		locales = allLocales;
 	}
 
 	for (const locale of locales) {

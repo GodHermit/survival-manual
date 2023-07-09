@@ -2,6 +2,7 @@ import { SettingsState } from '@/_helpers/settingsSlice';
 import store from '@/app/[locale]/store';
 import { Locale } from '@/_lib/messages';
 import { ArticleMetadata } from '@/_helpers/articlesSlice';
+import { locales } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';
 export const APIS_CACHE = 'apis';
@@ -94,12 +95,10 @@ async function setCacheForCurrentLocale(locale: string = 'en') {
  */
 async function setCacheForAllLocales() {
 	const apiCache = await caches.open(APIS_CACHE);
-	const locales = await (await fetch('/api/locales')).json() as Locale[];
 
 	apiCache.add('/api/locales'); // Cache all locales
 
 	locales
-		.map(locale => locale.code) // Get locales codes
 		.forEach(async locale => {
 			await setPagesCache(locale);
 
