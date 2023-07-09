@@ -5,6 +5,11 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 	dest: 'public',
 	sw: 'serviceWorker.js',
 	publicExcludes: ['!wiki/**/*'],
+	cacheStartUrl: false,
+	dynamicStartUrl: false,
+	fallbacks: {
+		document: '/offline',
+	},
 	workboxOptions: {
 		additionalManifestEntries: [
 			{ url: '/offline', revision: null },
@@ -12,21 +17,36 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 		importScripts: ['/articlesSW.js'],
 		runtimeCaching: [
 			{
-				urlPattern: /assets\/.*|favicon\.ico/i, // static assets
+				urlPattern: ({ url: { pathname }, sameOrigin }) => // /manifest.json?locale=...
+					sameOrigin && (
+						pathname.startsWith('/manifest.json')
+					),
+				handler: 'NetworkFirst',
+				options: {
+					cacheName: 'manifest',
+					expiration: {
+						maxEntries: 1
+					},
+					matchOptions: {
+						ignoreSearch: true
+					}
+				}
+			},
+			{
+				urlPattern: ({ url: { pathname }, sameOrigin }) => // static assets, /favicon.ico
+					sameOrigin && (
+						pathname.startsWith('/assets/')
+						|| pathname.startsWith('/favicon.ico')
+					),
 				handler: 'StaleWhileRevalidate',
 				options: {
 					cacheName: 'static-assets'
 				}
 			},
 			{
-				urlPattern: /\/.*/i,
-				handler: 'NetworkOnly',
-				options: {
-					precacheFallback: {
-						fallbackURL: '/offline',
-					}
-				}
-			},
+				urlPattern: /\/.*/i, // everything else
+				handler: 'NetworkOnly'
+			}
 		]
 	}
 });

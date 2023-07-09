@@ -9,7 +9,7 @@ self.addEventListener('fetch', (e) => {
 
 	const urlWithoutParams = url.replace(/\?.*/, '');
 
-	if (/\/(?:assets|_next|favicon).*/i.test(urlWithoutParams)) { // exclude static assets and nextjs files+
+	if (/\/(?:assets|_next|favicon|manifest).*/i.test(urlWithoutParams)) { // exclude static assets and nextjs files+
 		return;
 	}
 
