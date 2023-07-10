@@ -107,6 +107,21 @@ export function middleware(request: NextRequest) {
 		);
 	}
 
+	// If cookie is set but doesn't match the locale
+	if (
+		request.cookies.get('NEXT_LOCALE')
+		&& request.cookies.get('NEXT_LOCALE')?.value !== locale
+	) {
+		response.cookies.set(
+			'NEXT_LOCALE',
+			locale,
+			{
+				path: '/',
+				sameSite: 'strict'
+			}
+		);
+	}
+
 	return response;
 }
 

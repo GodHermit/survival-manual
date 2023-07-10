@@ -6,17 +6,47 @@ import sideNavSlice, { initialSideNavState } from '@/components/SideNav/sideNavS
 import { configureStore } from '@reduxjs/toolkit';
 import { getCookie, setCookie } from 'cookies-next';
 
+/**
+ * Server-side preloaded state
+ */
 export const preloadedState = {
 	sideNav: initialSideNavState,
 	settings: initialSettings,
 	articles: initialArticlesState
 }
 
-const preloadedSettings = JSON.parse( // Load settings from localStorage
-	typeof window !== 'undefined'
-	&& localStorage.getItem('settings') || '{}'
-);
+/**
+ * Get preloaded settings from localStorage
+ * @returns preloaded settings from localStorage
+ */
+const preloadedSettings = (() => {
+	// If window is defined
+	if (typeof window !== 'undefined') {
 
+		// If settings is not in localStorage
+		if (!localStorage.getItem('settings')) {
+			localStorage.setItem('settings', JSON.stringify(initialSettings)); // Set initial settings to localStorage
+		}
+
+		let preloadedSettings = JSON.parse(localStorage.getItem('settings') || '{}'); // Get settings from localStorage
+		const localeFromCookie = getCookie('NEXT_LOCALE'); // Get locale from cookie
+
+		// If locale in localStorage is different from locale in cookie
+		if (preloadedSettings.locale !== localeFromCookie) {
+			preloadedSettings.locale = localeFromCookie; // Set locale from cookie to settings
+			localStorage.setItem('settings', JSON.stringify(preloadedSettings)); // Save settings to localStorage
+		}
+
+		return preloadedSettings; // Return settings from localStorage
+	}
+
+	// If window is not defined, return empty object
+	return {};
+})();
+
+/**
+ * Create store with preloaded state
+ */
 const store = configureStore({
 	reducer: {
 		sideNav: sideNavSlice,
@@ -26,8 +56,7 @@ const store = configureStore({
 	preloadedState: {
 		settings: {
 			...initialSettings, // Load default settings
-			...preloadedSettings, // Load settings from localStorage
-			locale: getCookie('NEXT_LOCALE') || preloadedSettings.locale || initialSettings.locale, // Load locale from cookie
+			...preloadedSettings // Load settings from localStorage
 		}
 	}
 });
