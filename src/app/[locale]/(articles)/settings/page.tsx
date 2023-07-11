@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
 		dispatch(resetSettings());
 
-		router.push(`/${initialSettings.locale}/settings`); // reset locale
+		router.refresh(); // refresh page to reset locale
 		setColorMode(initialSettings.colorMode); // reset color mode
 
 		dispatch(setSettings(

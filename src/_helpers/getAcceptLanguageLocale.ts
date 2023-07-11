@@ -1,11 +1,8 @@
+import { defaultLocale, locales } from '@/middleware';
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
-export function getAcceptLanguageLocale(
-	requestHeaders: Headers,
-	locales: Array<string>,
-	defaultLocale: string
-) {
+export function getAcceptLanguageLocale(requestHeaders: Headers) {
 	let locale = defaultLocale;
 
 	const languages = new Negotiator({

@@ -1,54 +1,28 @@
+import { getLocaleFromPathname, getLocaleFromRequest } from '@/_lib/locales';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAcceptLanguageLocale } from './_helpers/getAcceptLanguageLocale';
 
 /**
  * List of all supported locales
  */
-export const locales = ['en', 'uk'];
+export const locales: string[] = ['en', 'uk'];
 /**
- * Default locale
+ * Default locale from `locales` array
+ * @returns `en` or first locale in `locales` array
  */
-export const defaultLocale = 'en';
+export const defaultLocale: string = locales.find(locale => locale === 'en') || locales[0];
 /**
  * List of all pages that are part of the app
  * (Pathnames of this page are always without locale prefix)
  */
-export const appPages = ['/offline', '/settings'];
-
-/**
- * Returns locale from cookie or Accept-Language header or default locale
- * @param request NextRequest object
- * @returns Supported locale
- */
-function getLocale(request: NextRequest) {
-	let localeInCookie = request.cookies.get('NEXT_LOCALE')?.value;
-
-	let acceptLanguage = getAcceptLanguageLocale(request.headers, locales, defaultLocale);
-
-	let locale = localeInCookie || acceptLanguage || defaultLocale;
-
-	return locale;
-}
-
-/**
- * Returns locale from pathname
- * @param pathname String to parse
- * @returns Supported locale or undefined
- */
-export function getLocaleFromPathname(pathname: string) {
-	const locale = pathname.split('/')[1];
-
-	if (locales.includes(locale)) {
-		return locale;
-	}
-
-	return undefined;
-}
+export const pagesWithoutLocalePrefix = [
+	'/offline',
+	'/settings'
+];
 
 export function middleware(request: NextRequest) {
 	const url = new URL(request.url);
 	const localeFromPathname = getLocaleFromPathname(url.pathname);
-	const preferredLocale = getLocale(request);
+	const preferredLocale = getLocaleFromRequest(request);
 	const locale = localeFromPathname || preferredLocale;
 	const pathnameWithoutLocale = url.pathname.replace(`/${locale}`, '');
 
@@ -77,14 +51,14 @@ export function middleware(request: NextRequest) {
 	// Add locale prefix to the path if it's not there
 	if (
 		!localeFromPathname
-		&& !appPages.includes(pathnameWithoutLocale)
+		&& !pagesWithoutLocalePrefix.includes(pathnameWithoutLocale)
 	) {
 		response = redirect(`/${locale}${url.pathname}`);
 	}
 
 	// If page is one of the app pages
 	if (
-		appPages.includes(pathnameWithoutLocale)
+		pagesWithoutLocalePrefix.includes(pathnameWithoutLocale)
 	) {
 		// If locale prefix is present, remove it
 		if (localeFromPathname) {
@@ -124,16 +98,6 @@ export function middleware(request: NextRequest) {
 
 	return response;
 }
-
-// // export default createMiddleware({
-// // 	// A list of all locales that are supported
-// // 	locales: ['en', 'uk'],
-
-// // 	defaultLocale: 'en',
-
-// // 	// Include a prefix for the default locale as well
-// // 	localePrefix: 'always'
-// // });
 
 export const config = {
 	// Skip all paths that should not be internationalized
