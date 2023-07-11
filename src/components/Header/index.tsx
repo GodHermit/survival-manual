@@ -1,6 +1,6 @@
 
 import { Box, ButtonGroup, IconButton, Text, useDisclosure } from '@chakra-ui/react';
-import NextLink from 'next-intl/link';
+import NextLink from 'next/link';
 import { MdMenu, MdMenuOpen, MdSearch, MdSettings } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSideNavState, toggleSideNav } from '../SideNav/sideNavSlice';

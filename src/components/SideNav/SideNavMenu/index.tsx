@@ -2,7 +2,7 @@ import { fetchArticlesMetadata, selectArticlesState, setArticlesState } from '@/
 import { groupBy } from '@/_helpers/groupBy';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
-import NextLink from 'next-intl/link';
+import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createElement, useEffect, useState } from 'react';
 import * as MdIcons from 'react-icons/md';
@@ -165,7 +165,7 @@ export default function SideNavMenu() {
 								>
 									<IconButton
 										as={NextLink}
-										href={item.href || '/'}
+										href={`/${locale}${item.href}` || `/${locale}}`}
 										icon={item.icon || <Text>{item.label?.charAt(0)}</Text>}
 										aria-label={item.label || ''}
 										variant='ghost'
@@ -179,7 +179,7 @@ export default function SideNavMenu() {
 						return (
 							<Button
 								as={NextLink}
-								href={item.href || '/'}
+								href={`/${locale}${item.href}` || `/${locale}}`}
 								key={`${breakpoint}-${i}`}
 								onClick={!isDesktop ? () => dispatch(setSideNav({ isOpen: false })) : undefined}
 								variant='ghost'
