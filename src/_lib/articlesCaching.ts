@@ -1,7 +1,9 @@
-import { SettingsState } from '@/_helpers/settingsSlice';
-import store from '@/app/[locale]/store';
-import { Locale } from '@/_lib/messages';
 import { ArticleMetadata } from '@/_helpers/articlesSlice';
+import { SettingsState } from '@/_helpers/settingsSlice';
+import { isLocaleSupported } from '@/_lib/locales';
+import { Locale } from '@/_lib/messages';
+import store from '@/app/[locale]/store';
+import { locales, pagesWithoutLocalePrefix } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';
 export const APIS_CACHE = 'apis';
@@ -39,6 +41,9 @@ export function setArticlesCache(currentLocale: string = 'en') {
 
 	switch (settings.cacheLocales) {
 		case 'current':
+			if (!isLocaleSupported(currentLocale)) {
+				throw new Error('LOCALE_IS_NOT_SUPPORTED');
+			}
 			setCacheForCurrentLocale(currentLocale)
 				.then(() => {
 					store.dispatch({ // Set isCacheChanging to false
@@ -94,12 +99,10 @@ async function setCacheForCurrentLocale(locale: string = 'en') {
  */
 async function setCacheForAllLocales() {
 	const apiCache = await caches.open(APIS_CACHE);
-	const locales = await (await fetch('/api/locales')).json() as Locale[];
 
 	apiCache.add('/api/locales'); // Cache all locales
 
 	locales
-		.map(locale => locale.code) // Get locales codes
 		.forEach(async locale => {
 			await setPagesCache(locale);
 
@@ -118,7 +121,7 @@ async function setCacheForAllLocales() {
  * @returns If current locale is default, returns path as is, otherwise returns path with current locale prefix
  */
 function normalizePath(path: string, locale: string = 'en') {
-	return `/${locale}${path}`;
+	return pagesWithoutLocalePrefix.includes(path) ? path : `/${locale}${path}`;
 }
 
 /**
@@ -219,6 +222,10 @@ async function setArticlesCacheForLocale(locale: string = 'en') {
  * @param {string} [locale] locale of translated media files (if not specified, only general media files will be cached)
  */
 export async function setArticlesMediaCache(locale?: string) {
+	if (locale && !isLocaleSupported(locale)) {
+		throw new Error('LOCALE_IS_NOT_SUPPORTED');
+	}
+
 	const settings = await store.getState().settings;
 	if (!settings.isCachingMediaEnabled) {
 		throw new Error('ARTICLES_MEDIA_CACHE_DISABLED');
