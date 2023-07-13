@@ -12,7 +12,6 @@ export const ARTICLES_MEDIA_CACHE = 'articles-media';
 
 const APP_PAGES = [
 	'/settings',
-	'/offline',
 ];
 
 /**
@@ -156,6 +155,55 @@ async function setPagesCache(locale: string = 'en') {
 		});
 		pagesCache.put(`${page}?_rsc`, response);
 	});
+}
+
+/**
+ * Add offline page to cache for current locale
+ */
+export async function setOfflinePageCache() {
+	// If network is offline, don't try to cache offline page
+	if (!window.navigator.onLine) {
+		return;
+	}
+
+	// Get cache with name 'workbox-precache'
+	const cacheNames = (await caches.keys())
+		.filter(name => name.startsWith('workbox-precache'));
+
+	// If there is no cache with name 'workbox-precache'
+	if (cacheNames.length <= 0) {
+		return;
+	}
+
+	const cache = await caches.open(cacheNames[0]);
+
+	// Fetch offline page
+	const offlinePageRes = await fetch(
+		'/offline',
+		{
+			redirect: 'follow'
+		}
+	);
+
+	// Fetch offline page RSC
+	const offlinePageRscRes = await fetch(
+		'/offline?_rsc',
+		{
+			headers: {
+				'Rsc': '1',
+			},
+			redirect: 'follow'
+		}
+	);
+
+	// If offline page or offline page RSC are not ok
+	if (!offlinePageRes.ok && !offlinePageRscRes.ok) {
+		return;
+	}
+
+	// Put offline page and offline page RSC to cache
+	cache.put('/offline', offlinePageRes);
+	cache.put('/offline?_rsc', offlinePageRscRes);
 }
 
 /**

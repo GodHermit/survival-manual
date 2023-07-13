@@ -2,6 +2,7 @@
 
 import articlesSlice, { initialArticlesState } from '@/_helpers/articlesSlice';
 import settingsSlice, { initialSettings } from '@/_helpers/settingsSlice';
+import { setOfflinePageCache } from '@/_lib/articlesCaching';
 import sideNavSlice, { initialSideNavState } from '@/components/SideNav/sideNavSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { getCookie, setCookie } from 'cookies-next';
@@ -22,19 +23,25 @@ export const preloadedState = {
 const preloadedSettings = (() => {
 	// If window is defined
 	if (typeof window !== 'undefined') {
+		let isFirstVisit = false; // Is first visit flag
 
 		// If settings is not in localStorage
 		if (!localStorage.getItem('settings')) {
 			localStorage.setItem('settings', JSON.stringify(initialSettings)); // Set initial settings to localStorage
+			isFirstVisit = true; // Set is first visit flag
 		}
 
 		let preloadedSettings = JSON.parse(localStorage.getItem('settings') || '{}'); // Get settings from localStorage
-		const localeFromCookie = getCookie('NEXT_LOCALE'); // Get locale from cookie
+		const localeFromCookie = getCookie('NEXT_LOCALE') as string; // Get locale from cookie
 
 		// If locale in localStorage is different from locale in cookie
 		if (preloadedSettings.locale !== localeFromCookie) {
 			preloadedSettings.locale = localeFromCookie; // Set locale from cookie to settings
 			localStorage.setItem('settings', JSON.stringify(preloadedSettings)); // Save settings to localStorage
+
+			if (!isFirstVisit) {
+				setOfflinePageCache(); // Add offline page to cache
+			}
 		}
 
 		return preloadedSettings; // Return settings from localStorage
@@ -86,6 +93,8 @@ store.subscribe(() => {
 				sameSite: 'strict',
 			}
 		);
+
+		setOfflinePageCache(); // Add offline page to cache
 	}
 });
 
