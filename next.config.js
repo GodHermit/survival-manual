@@ -7,9 +7,6 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 	publicExcludes: ['!wiki/**/*'],
 	cacheStartUrl: false,
 	dynamicStartUrl: false,
-	fallbacks: {
-		document: '/offline',
-	},
 	workboxOptions: {
 		additionalManifestEntries: [
 			{ url: '/offline', revision: null },
@@ -24,9 +21,6 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 				handler: 'NetworkFirst',
 				options: {
 					cacheName: 'manifest',
-					expiration: {
-						maxEntries: 1
-					},
 					matchOptions: {
 						ignoreSearch: true
 					}
@@ -45,7 +39,12 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 			},
 			{
 				urlPattern: /\/.*/i, // everything else
-				handler: 'NetworkOnly'
+				handler: 'NetworkOnly',
+				options: {
+					precacheFallback: {
+						fallbackURL: '/offline',
+					}
+				}
 			}
 		]
 	}

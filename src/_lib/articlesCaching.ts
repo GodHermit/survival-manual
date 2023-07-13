@@ -6,6 +6,7 @@ import store from '@/app/[locale]/store';
 import { locales, pagesWithoutLocalePrefix } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';
+export const MANIFEST_CACHE = 'manifest';
 export const APIS_CACHE = 'apis';
 export const ARTICLES_CACHE = 'articles';
 export const ARTICLES_MEDIA_CACHE = 'articles-media';
@@ -204,6 +205,39 @@ export async function setOfflinePageCache() {
 	// Put offline page and offline page RSC to cache
 	cache.put('/offline', offlinePageRes);
 	cache.put('/offline?_rsc', offlinePageRscRes);
+}
+
+/**
+ * Add manifest to cache for current locale or for all locales
+ */
+export async function setManifestCache(locale: string, settings: SettingsState) {
+	// If network is offline, don't try to cache offline page
+	if (!window.navigator.onLine) {
+		return;
+	}
+
+	const manifestCache = await caches.open(MANIFEST_CACHE);
+
+	// If cacheLocales is 'all' or 'everyLocale'
+	if (locale === 'everyLocale' || settings.cacheLocales === 'all') {
+		locales.forEach(locale => { // Cache manifest for all locales
+			manifestCache.add(`/manifest.json?locale=${locale}`);
+		});
+		return;
+	}
+
+	// Otherwise cache manifest for current locale
+	const manifests = await manifestCache.keys();
+	manifestCache.add(`/manifest.json?locale=${locale}`)
+		.then(() => {
+			// Delete all manifests for other locales
+			manifests.forEach(manifest => {
+				// If manifest is not for current locale
+				if (!manifest.url.endsWith(`/manifest.json?locale=${locale}`)) {
+					manifestCache.delete(manifest); // Delete manifest from cache
+				}
+			});
+		});
 }
 
 /**

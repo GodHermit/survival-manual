@@ -2,7 +2,7 @@
 
 import articlesSlice, { initialArticlesState } from '@/_helpers/articlesSlice';
 import settingsSlice, { initialSettings } from '@/_helpers/settingsSlice';
-import { setOfflinePageCache } from '@/_lib/articlesCaching';
+import { setManifestCache, setOfflinePageCache } from '@/_lib/articlesCaching';
 import sideNavSlice, { initialSideNavState } from '@/components/SideNav/sideNavSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { getCookie, setCookie } from 'cookies-next';
@@ -39,6 +39,9 @@ const preloadedSettings = (() => {
 			preloadedSettings.locale = localeFromCookie; // Set locale from cookie to settings
 			localStorage.setItem('settings', JSON.stringify(preloadedSettings)); // Save settings to localStorage
 
+			setManifestCache(localeFromCookie, preloadedSettings); // Add manifest(s) to cache
+
+			// If it is not first visit (settings is already in localStorage)
 			if (!isFirstVisit) {
 				setOfflinePageCache(); // Add offline page to cache
 			}
@@ -82,6 +85,8 @@ store.subscribe(() => {
 store.subscribe(() => {
 	const state = store.getState(); // Get current state
 	const localeInCookie = getCookie('NEXT_LOCALE'); // Get locale from cookie
+
+	setManifestCache(state.settings.locale, state.settings); // Add manifest(s) to cache
 
 	if (localeInCookie !== state.settings.locale) {
 		// If locale in cookie is different from locale in settings, update cookie
