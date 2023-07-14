@@ -21,6 +21,11 @@ export default function CachingSettings() {
 	 * Get last sync date from cache.
 	 */
 	useEffect(() => {
+		// If caching is disabled, don't check for last sync date.
+		if (!state.isCachingEnabled) {
+			return;
+		}
+
 		caches.open('articles')
 			.then(async (cache) => {
 				const keys = await cache.keys();
@@ -36,7 +41,7 @@ export default function CachingSettings() {
 					cacheLastSyncTimestamp: new Date(date).getTime()
 				}));
 			});
-	}, [dispatch]);
+	}, [state.isCachingEnabled, dispatch]);
 
 	/**
 	 * Handle 'caching' switch change.
