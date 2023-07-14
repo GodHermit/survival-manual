@@ -34,6 +34,12 @@
 		"copySuccess": "Link copied to clipboard",
 		"copyError": "Failed to copy link to clipboard"
 	},
+	"SWUpdateDialog": {
+		"title": "New version available",
+		"text": "A new version of the app is available. Do you want to update now?",
+		"cancelButton": "Remind me later",
+		"confirmButton": "Update"
+	},
 	"Settings": {
 		"title": "Settings",
 		"reset": "Reset Settings",
