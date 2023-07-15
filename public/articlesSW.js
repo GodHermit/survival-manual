@@ -37,6 +37,11 @@ const toCache = [
 ];
 
 self.addEventListener('activate', async (e) => {
+	// If browser doesn't support caches
+	if (!('caches' in self)) {
+		return; // Return error response
+	}
+
 	// If network is offline, don't try to cache offline page
 	if (!self.navigator.onLine) {
 		return;
@@ -88,6 +93,11 @@ self.addEventListener('fetch', (e) => {
 			...e.request,
 		})
 			.catch(async () => {
+				// If browser doesn't support caches
+				if (!('caches' in self)) {
+					return Response.error(); // Return error response
+				}
+
 				// Get cached response
 				const res = await caches.match(url);
 

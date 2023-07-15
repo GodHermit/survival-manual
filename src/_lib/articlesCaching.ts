@@ -20,6 +20,11 @@ const APP_PAGES = [
  * @param {string} [currentLocale=en] - Current locale selected by user (default: 'en')
  */
 export function setArticlesCache(currentLocale: string = 'en') {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
 	const settings = store.getState().settings as SettingsState;
 
 	if (!settings.isCachingEnabled) {// If caching is disabled
@@ -76,6 +81,11 @@ export function setArticlesCache(currentLocale: string = 'en') {
  * Delete all caches related to articles
  */
 export function deleteArticlesCache() {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
 	caches.delete(PAGES_CACHE);
 	caches.delete(APIS_CACHE);
 	caches.delete(ARTICLES_CACHE);
@@ -162,6 +172,11 @@ async function setPagesCache(locale: string = 'en') {
  * Add offline page to cache for current locale
  */
 export async function setOfflinePageCache() {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		return;
+	}
+
 	// If network is offline, don't try to cache offline page
 	if (!window.navigator.onLine) {
 		return;
@@ -211,6 +226,11 @@ export async function setOfflinePageCache() {
  * Add manifest to cache for current locale or for all locales
  */
 export async function setManifestCache(locale: string, settings: SettingsState) {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		return;
+	}
+
 	// If network is offline, don't try to cache offline page
 	if (!window.navigator.onLine) {
 		return;
@@ -304,6 +324,11 @@ async function setArticlesCacheForLocale(locale: string = 'en') {
  * @param {string} [locale] locale of translated media files (if not specified, only general media files will be cached)
  */
 export async function setArticlesMediaCache(locale?: string) {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
 	if (locale && !isLocaleSupported(locale)) {
 		throw new Error('LOCALE_IS_NOT_SUPPORTED');
 	}
