@@ -20,17 +20,14 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 					),
 				handler: 'NetworkFirst',
 				options: {
-					cacheName: 'manifest',
-					matchOptions: {
-						ignoreSearch: true
-					}
+					cacheName: 'manifest'
 				}
 			},
 			{
 				urlPattern: ({ url: { pathname }, sameOrigin }) => // static assets, /favicon.ico
 					sameOrigin && (
-						pathname.startsWith('/assets/')
-						|| pathname.startsWith('/favicon.ico')
+						pathname.startsWith('/assets/') ||
+						pathname.startsWith('/favicon.ico')
 					),
 				handler: 'StaleWhileRevalidate',
 				options: {
