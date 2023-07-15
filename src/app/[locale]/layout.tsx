@@ -15,7 +15,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
 	if (!isLocaleSupported(locale)) {
-		throw new Error('LOCALE_IS_NOT_SUPPORTED')
+		notFound();
 	}
 	const messages = (await import(`@/_messages/${locale}.json`)).default;
 

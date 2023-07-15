@@ -18,6 +18,13 @@ export const pagesWithoutLocalePrefix = [
 	'/offline',
 	'/settings'
 ];
+/**
+ * List of all paths that should not be internationalized
+ */
+export const excludedPaths = [
+	'/api',
+	'/wiki',
+];
 
 export function middleware(request: NextRequest) {
 	const url = new URL(request.url);
@@ -50,8 +57,9 @@ export function middleware(request: NextRequest) {
 
 	// Add locale prefix to the path if it's not there
 	if (
-		!localeFromPathname
-		&& !pagesWithoutLocalePrefix.includes(pathnameWithoutLocale)
+		!localeFromPathname && // If locale prefix is not present
+		!pagesWithoutLocalePrefix.includes(pathnameWithoutLocale) && // If locale prefix should be added to the path
+		!new RegExp(`^(${excludedPaths.join('|')})`).test(pathnameWithoutLocale) // If path is not excluded
 	) {
 		response = redirect(`/${locale}${url.pathname}`);
 	}
@@ -101,5 +109,5 @@ export function middleware(request: NextRequest) {
 
 export const config = {
 	// Skip all paths that should not be internationalized
-	matcher: ['/((?!api|_next|wiki|.*\\..*).*)']
+	matcher: ['/((?!api|_next|.*\\..*).*)']
 };

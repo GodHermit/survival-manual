@@ -10,6 +10,11 @@
 		"title": "Oops! Something went wrong",
 		"backHome": "Go to home page"
 	},
+	"404Error": {
+		"title": "404 - Page Not Found",
+		"backHome": "Go to home page",
+		"webIllustrationBy": "Web illustration by Storyset"
+	},
 
 	"Header": {
 		"menu": "Menu",
