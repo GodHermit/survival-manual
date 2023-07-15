@@ -1,4 +1,4 @@
-import { selectArticlesState } from '@/_helpers/articlesSlice';
+import { selectArticlesState } from '@/_store/slices/articlesSlice';
 import { Card, CardBody, CardHeader, HStack, Heading, IconButton, Input, InputGroup, InputLeftElement, LinkBox, LinkOverlay, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, Text, UseDisclosureReturn, VStack } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import NextLink from 'next-intl/link';

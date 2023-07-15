@@ -1,8 +1,8 @@
-import { ArticleMetadata } from '@/_helpers/articlesSlice';
-import { SettingsState } from '@/_helpers/settingsSlice';
 import { isLocaleSupported } from '@/_lib/locales';
 import { Locale } from '@/_lib/messages';
-import store from '@/app/[locale]/store';
+import store from '@/_store';
+import { ArticleMetadata } from '@/_store/slices/articlesSlice';
+import { SettingsState } from '@/_store/slices/settingsSlice';
 import { locales, pagesWithoutLocalePrefix } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';

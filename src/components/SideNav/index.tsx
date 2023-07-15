@@ -1,9 +1,9 @@
+import { selectSideNavState, setSideNav } from '@/_store/slices/sideNavSlice';
 import SideNavMenu from '@/components/SideNav/SideNavMenu';
 import { Box, useBreakpoint, useBreakpointValue } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SideNavMobile from './SideNavMobile';
-import { selectSideNavState, setSideNav } from './sideNavSlice';
 
 export default function SideNav() {
 	const state = useSelector(selectSideNavState);
@@ -27,7 +27,7 @@ export default function SideNav() {
 	) : (
 		<Box
 			h='100vh'
-			minW={state.isOpen ? '250px': undefined}
+			minW={state.isOpen ? '250px' : undefined}
 			maxH='100svh'
 			p={2}
 			overflow='auto'

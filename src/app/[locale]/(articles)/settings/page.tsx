@@ -1,7 +1,7 @@
 'use client';
 
-import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
+import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_store/slices/settingsSlice';
 import { Box, Heading, IconButton, Tooltip, useColorMode } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';

@@ -1,5 +1,6 @@
-import { fetchArticlesMetadata, selectArticlesState, setArticlesState } from '@/_helpers/articlesSlice';
 import { groupBy } from '@/_helpers/groupBy';
+import { fetchArticlesMetadata, selectArticlesState, setArticlesState } from '@/_store/slices/articlesSlice';
+import { selectSideNavState, setSideNav } from '@/_store/slices/sideNavSlice';
 import { Button, Divider, Icon, IconButton, Spinner, Text, Tooltip, VStack, useBreakpoint } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import NextLink from 'next/link';
@@ -8,7 +9,6 @@ import { createElement, useEffect, useState } from 'react';
 import * as MdIcons from 'react-icons/md';
 import { MdReport } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSideNavState, setSideNav } from '../sideNavSlice';
 
 export interface SideNavMenuItem {
 	label: string;

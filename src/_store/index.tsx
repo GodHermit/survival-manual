@@ -1,9 +1,9 @@
 'use client';
 
-import articlesSlice, { initialArticlesState } from '@/_helpers/articlesSlice';
-import settingsSlice, { initialSettings } from '@/_helpers/settingsSlice';
 import { setManifestCache, setOfflinePageCache } from '@/_lib/articlesCaching';
-import sideNavSlice, { initialSideNavState } from '@/components/SideNav/sideNavSlice';
+import articlesSlice, { initialArticlesState } from '@/_store/slices/articlesSlice';
+import settingsSlice, { initialSettings } from '@/_store/slices/settingsSlice';
+import sideNavSlice, { initialSideNavState } from '@/_store/slices/sideNavSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { getCookie, setCookie } from 'cookies-next';
 

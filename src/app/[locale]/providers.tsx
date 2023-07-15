@@ -1,12 +1,12 @@
 'use client'
 
+import store, { preloadedState } from '@/_store';
 import theme from '@/_theme';
 import { customStorageManager } from '@/_theme/customStorageManager';
+import SWUpdate from '@/components/SWUpdate';
 import { CacheProvider } from '@chakra-ui/next-js';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
-import store, { preloadedState } from './store';
-import SWUpdate from '@/components/SWUpdate';
 
 export function Providers({
 	children

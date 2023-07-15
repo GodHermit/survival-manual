@@ -1,6 +1,6 @@
-import { SettingsState, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { ARTICLES_MEDIA_CACHE, setArticlesCache, setArticlesMediaCache } from '@/_lib/articlesCaching';
+import { SettingsState, selectSettingsState, setSettings } from '@/_store/slices/settingsSlice';
 import { Alert, AlertIcon, Box, FormControl, FormHelperText, FormLabel, Heading, Select, Spinner, Stack, Switch, Tag, useDisclosure } from '@chakra-ui/react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { ChangeEvent, useEffect, useState } from 'react';
