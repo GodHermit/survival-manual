@@ -88,8 +88,23 @@ self.addEventListener('fetch', (e) => {
 			...e.request,
 		})
 			.catch(async () => {
+				// Get cached response
 				const res = await caches.match(url);
-				return res || caches.match(`/offline${isRsc ? '?_rsc' : ''}`);
+
+				// If cached response exists
+				if (res) {
+					return res;
+				}
+
+				if (
+					url.startsWith('/api') || // Exclude API routes
+					/^\/.+\..+$/.test(urlWithoutParams) // Exclude files with extension
+				) {
+					return Response.error(); // Return error response
+				}
+
+				// Otherwise, return offline fallback page
+				return caches.match(`/offline${isRsc ? '?_rsc' : ''}`);
 			})
 	);
 });
