@@ -1,3 +1,5 @@
+import { isLocaleSupported } from '@/_lib/locales';
+import { locales } from '@/middleware';
 import { Metadata } from 'next';
 import { NextIntlClientProvider, createTranslator } from 'next-intl';
 import { notFound } from 'next/navigation';
@@ -6,10 +8,15 @@ import { Providers } from './providers';
 type Messages = typeof import('@/_messages/en.json');
 
 export function generateStaticParams() {
-	return [{ locale: 'en' }, { locale: 'uk' }];
+	return locales.map(locale => ({
+		locale
+	}));
 }
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+	if (!isLocaleSupported(locale)) {
+		notFound();
+	}
 	const messages = (await import(`@/_messages/${locale}.json`)).default;
 
 	const t = createTranslator({ locale, messages });
@@ -54,6 +61,10 @@ export default async function RootLayout({
 		locale: string,
 	},
 }) {
+	if (!isLocaleSupported(params.locale)) {
+		notFound();
+	}
+
 	let messages: Messages;
 	try {
 		messages = (await import(`@/_messages/${params.locale}.json`)).default;

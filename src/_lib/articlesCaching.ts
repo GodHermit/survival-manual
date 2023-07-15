@@ -1,16 +1,18 @@
-import { SettingsState } from '@/_helpers/settingsSlice';
-import store from '@/app/[locale]/store';
-import { Locale } from '@/_lib/messages';
 import { ArticleMetadata } from '@/_helpers/articlesSlice';
+import { SettingsState } from '@/_helpers/settingsSlice';
+import { isLocaleSupported } from '@/_lib/locales';
+import { Locale } from '@/_lib/messages';
+import store from '@/app/[locale]/store';
+import { locales, pagesWithoutLocalePrefix } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';
+export const MANIFEST_CACHE = 'manifest';
 export const APIS_CACHE = 'apis';
 export const ARTICLES_CACHE = 'articles';
 export const ARTICLES_MEDIA_CACHE = 'articles-media';
 
 const APP_PAGES = [
 	'/settings',
-	'/offline',
 ];
 
 /**
@@ -18,6 +20,11 @@ const APP_PAGES = [
  * @param {string} [currentLocale=en] - Current locale selected by user (default: 'en')
  */
 export function setArticlesCache(currentLocale: string = 'en') {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
 	const settings = store.getState().settings as SettingsState;
 
 	if (!settings.isCachingEnabled) {// If caching is disabled
@@ -39,6 +46,9 @@ export function setArticlesCache(currentLocale: string = 'en') {
 
 	switch (settings.cacheLocales) {
 		case 'current':
+			if (!isLocaleSupported(currentLocale)) {
+				throw new Error('LOCALE_IS_NOT_SUPPORTED');
+			}
 			setCacheForCurrentLocale(currentLocale)
 				.then(() => {
 					store.dispatch({ // Set isCacheChanging to false
@@ -71,6 +81,11 @@ export function setArticlesCache(currentLocale: string = 'en') {
  * Delete all caches related to articles
  */
 export function deleteArticlesCache() {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
 	caches.delete(PAGES_CACHE);
 	caches.delete(APIS_CACHE);
 	caches.delete(ARTICLES_CACHE);
@@ -94,12 +109,10 @@ async function setCacheForCurrentLocale(locale: string = 'en') {
  */
 async function setCacheForAllLocales() {
 	const apiCache = await caches.open(APIS_CACHE);
-	const locales = await (await fetch('/api/locales')).json() as Locale[];
 
 	apiCache.add('/api/locales'); // Cache all locales
 
 	locales
-		.map(locale => locale.code) // Get locales codes
 		.forEach(async locale => {
 			await setPagesCache(locale);
 
@@ -118,7 +131,7 @@ async function setCacheForAllLocales() {
  * @returns If current locale is default, returns path as is, otherwise returns path with current locale prefix
  */
 function normalizePath(path: string, locale: string = 'en') {
-	return `/${locale}${path}`;
+	return pagesWithoutLocalePrefix.includes(path) ? path : `/${locale}${path}`;
 }
 
 /**
@@ -153,6 +166,98 @@ async function setPagesCache(locale: string = 'en') {
 		});
 		pagesCache.put(`${page}?_rsc`, response);
 	});
+}
+
+/**
+ * Add offline page to cache for current locale
+ */
+export async function setOfflinePageCache() {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		return;
+	}
+
+	// If network is offline, don't try to cache offline page
+	if (!window.navigator.onLine) {
+		return;
+	}
+
+	// Get cache with name 'workbox-precache'
+	const cacheNames = (await caches.keys())
+		.filter(name => name.startsWith('workbox-precache'));
+
+	// If there is no cache with name 'workbox-precache'
+	if (cacheNames.length <= 0) {
+		return;
+	}
+
+	const cache = await caches.open(cacheNames[0]);
+
+	// Fetch offline page
+	const offlinePageRes = await fetch(
+		'/offline',
+		{
+			redirect: 'follow'
+		}
+	);
+
+	// Fetch offline page RSC
+	const offlinePageRscRes = await fetch(
+		'/offline?_rsc',
+		{
+			headers: {
+				'Rsc': '1',
+			},
+			redirect: 'follow'
+		}
+	);
+
+	// If offline page or offline page RSC are not ok
+	if (!offlinePageRes.ok && !offlinePageRscRes.ok) {
+		return;
+	}
+
+	// Put offline page and offline page RSC to cache
+	cache.put('/offline', offlinePageRes);
+	cache.put('/offline?_rsc', offlinePageRscRes);
+}
+
+/**
+ * Add manifest to cache for current locale or for all locales
+ */
+export async function setManifestCache(locale: string, settings: SettingsState) {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		return;
+	}
+
+	// If network is offline, don't try to cache offline page
+	if (!window.navigator.onLine) {
+		return;
+	}
+
+	const manifestCache = await caches.open(MANIFEST_CACHE);
+
+	// If cacheLocales is 'all' or 'everyLocale'
+	if (locale === 'everyLocale' || settings.cacheLocales === 'all') {
+		locales.forEach(locale => { // Cache manifest for all locales
+			manifestCache.add(`/manifest.json?locale=${locale}`);
+		});
+		return;
+	}
+
+	// Otherwise cache manifest for current locale
+	const manifests = await manifestCache.keys();
+	manifestCache.add(`/manifest.json?locale=${locale}`)
+		.then(() => {
+			// Delete all manifests for other locales
+			manifests.forEach(manifest => {
+				// If manifest is not for current locale
+				if (!manifest.url.endsWith(`/manifest.json?locale=${locale}`)) {
+					manifestCache.delete(manifest); // Delete manifest from cache
+				}
+			});
+		});
 }
 
 /**
@@ -219,6 +324,15 @@ async function setArticlesCacheForLocale(locale: string = 'en') {
  * @param {string} [locale] locale of translated media files (if not specified, only general media files will be cached)
  */
 export async function setArticlesMediaCache(locale?: string) {
+	// If browser doesn't support caches
+	if (!('caches' in window)) {
+		throw new Error('CACHES_NOT_SUPPORTED');
+	}
+
+	if (locale && !isLocaleSupported(locale)) {
+		throw new Error('LOCALE_IS_NOT_SUPPORTED');
+	}
+
 	const settings = await store.getState().settings;
 	if (!settings.isCachingMediaEnabled) {
 		throw new Error('ARTICLES_MEDIA_CACHE_DISABLED');

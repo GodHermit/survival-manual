@@ -1,14 +1,15 @@
 import { SettingsState, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { ARTICLES_MEDIA_CACHE, setArticlesCache, setArticlesMediaCache } from '@/_lib/articlesCaching';
-import { Box, FormControl, FormHelperText, FormLabel, Heading, Select, Spinner, Stack, Switch, Tag, useDisclosure } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, FormControl, FormHelperText, FormLabel, Heading, Select, Spinner, Stack, Switch, Tag, useDisclosure } from '@chakra-ui/react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DeleteCacheDialog from './DeleteCacheDialog';
 import UpdateCacheButton from './UpdateCacheButton';
 
 export default function CachingSettings() {
+	const [isCachesSupported, setIsCachesSupported] = useState<boolean>(true);
 	const deleteCacheDialog = useDisclosure();
 	const state = useSelector(selectSettingsState);
 	const dispatch = useDispatch();
@@ -21,6 +22,24 @@ export default function CachingSettings() {
 	 * Get last sync date from cache.
 	 */
 	useEffect(() => {
+		// If browser doesn't support caches
+		if (!('caches' in window)) {
+			setIsCachesSupported(false);
+
+			// Reset caching settings to default.
+			dispatch(setSettings({
+				isCachingEnabled: false,
+				cacheLocales: 'current',
+				isCachingMediaEnabled: false
+			}));
+			return;
+		}
+
+		// If caching is disabled, don't check for last sync date.
+		if (!state.isCachingEnabled) {
+			return;
+		}
+
 		caches.open('articles')
 			.then(async (cache) => {
 				const keys = await cache.keys();
@@ -36,13 +55,19 @@ export default function CachingSettings() {
 					cacheLastSyncTimestamp: new Date(date).getTime()
 				}));
 			});
-	}, [dispatch]);
+	}, [state.isCachingEnabled, dispatch]);
 
 	/**
 	 * Handle 'caching' switch change.
 	 * @param e event object
 	 */
 	const handleArticlesCachingChange = (e: ChangeEvent<HTMLInputElement>) => {
+		// If browser doesn't support caches
+		if (!('caches' in window)) {
+			setIsCachesSupported(false);
+			return;
+		}
+
 		if (e.target.checked) {
 			dispatch(setSettings({
 				isCachingEnabled: e.target.checked,
@@ -61,6 +86,12 @@ export default function CachingSettings() {
 	 * @param e event object
 	 */
 	const handleCachingLocalesChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		// If browser doesn't support caches
+		if (!('caches' in window)) {
+			setIsCachesSupported(false);
+			return;
+		}
+
 		if (!isOnline) {
 			return;
 		}
@@ -77,6 +108,12 @@ export default function CachingSettings() {
 	 * @param e event object
 	 */
 	const handleArticlesMediaCachingChange = (e: ChangeEvent<HTMLInputElement>) => {
+		// If browser doesn't support caches
+		if (!('caches' in window)) {
+			setIsCachesSupported(false);
+			return;
+		}
+
 		dispatch(setSettings({
 			isCachingMediaEnabled: e.target.checked,
 			isCacheChanging: true
@@ -101,10 +138,28 @@ export default function CachingSettings() {
 
 	return (
 		<>
-			<Heading as='h2' size='lg' mb={4} mt={6}>{t('caching.heading')}</Heading>
+			<Heading
+				as='h2'
+				size='lg'
+				mt={6}
+				mb={4}
+			>
+				{t('caching.heading')}
+			</Heading>
+			{!isCachesSupported && (
+				<Alert
+					status='error'
+					variant='subtle'
+					mb={4}
+					borderRadius='md'
+				>
+					<AlertIcon />
+					{t('caching.notSupported')}!
+				</Alert>
+			)}
 			<FormControl
 				mb={4}
-				isDisabled={state.isCacheChanging || (!isOnline && !state.isCachingEnabled)}
+				isDisabled={state.isCacheChanging || (!isOnline && !state.isCachingEnabled) || !isCachesSupported}
 			>
 				<Box
 					display='flex'
@@ -133,7 +188,7 @@ export default function CachingSettings() {
 						onChange={handleArticlesCachingChange}
 					/>
 				</Box>
-				{state.isCachingEnabled && (
+				{(state.isCachingEnabled && isCachesSupported) && (
 					<FormHelperText
 						display='flex'
 						alignItems='baseline'

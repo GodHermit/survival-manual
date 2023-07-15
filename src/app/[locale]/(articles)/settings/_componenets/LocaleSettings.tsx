@@ -1,6 +1,7 @@
 import { selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { setArticlesCache } from '@/_lib/articlesCaching';
+import { isLocaleSupported } from '@/_lib/locales';
 import { Locale } from '@/_lib/messages';
 import { FormControl, FormLabel, Select } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -28,6 +29,10 @@ export default function LocaleSettings() {
 	}, [isOnline]);
 
 	const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		if (!isLocaleSupported(e.target.value)) {
+			return;
+		}
+
 		dispatch(setSettings({
 			locale: e.target.value,
 		}));
@@ -41,11 +46,11 @@ export default function LocaleSettings() {
 		}
 
 		startTransition(() => {
-			router.replace(`/${e.target.value}/settings`);
+			router.refresh();
 		});
 	};
 
-	useEffect(() => {		
+	useEffect(() => {
 		dispatch(setSettings({
 			isLanguageChanging: isPending
 		}));
