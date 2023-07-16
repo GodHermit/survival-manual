@@ -1,8 +1,8 @@
 'use client';
 
-import { fetchArticlesMetadata, setArticlesState } from '@/_helpers/articlesSlice';
-import { selectSettingsState } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
+import { fetchArticlesMetadata, setArticlesState } from '@/_store/slices/articlesSlice';
+import { selectSettingsState } from '@/_store/slices/settingsSlice';
 import Header from '@/components/Header';
 import SideNav from '@/components/SideNav';
 import { Alert, AlertIcon, AlertTitle, Box, Grid, GridItem, useBreakpoint, useColorModeValue } from '@chakra-ui/react';

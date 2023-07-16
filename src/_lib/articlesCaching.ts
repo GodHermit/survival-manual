@@ -1,8 +1,8 @@
-import { ArticleMetadata } from '@/_helpers/articlesSlice';
-import { SettingsState } from '@/_helpers/settingsSlice';
 import { isLocaleSupported } from '@/_lib/locales';
 import { Locale } from '@/_lib/messages';
-import store from '@/app/[locale]/store';
+import store from '@/_store';
+import { ArticleMetadata } from '@/_store/slices/articlesSlice';
+import { SettingsState } from '@/_store/slices/settingsSlice';
 import { locales, pagesWithoutLocalePrefix } from '@/middleware';
 
 export const PAGES_CACHE = 'pages';
@@ -49,7 +49,7 @@ export function setArticlesCache(currentLocale: string = 'en') {
 			if (!isLocaleSupported(currentLocale)) {
 				throw new Error('LOCALE_IS_NOT_SUPPORTED');
 			}
-			setCacheForCurrentLocale(currentLocale)
+			setCacheForCurrentLocale(currentLocale, settings)
 				.then(() => {
 					store.dispatch({ // Set isCacheChanging to false
 						type: 'settings/setSettings',
@@ -61,7 +61,7 @@ export function setArticlesCache(currentLocale: string = 'en') {
 				});
 			break;
 		case 'all':
-			setCacheForAllLocales()
+			setCacheForAllLocales(settings)
 				.then(() => {
 					store.dispatch({ // Set isCacheChanging to false
 						type: 'settings/setSettings',
@@ -96,18 +96,22 @@ export function deleteArticlesCache() {
  * Set cache for articles for current locale
  * @param {string} locale current locale selected by user (default: 'en')
  */
-async function setCacheForCurrentLocale(locale: string = 'en') {
+async function setCacheForCurrentLocale(locale: string = 'en', settings: SettingsState) {
 	await setPagesCache(locale);
 	await setAPIsCache(locale);
 
 	await setArticlesCacheForLocale(locale);
-	await setArticlesMediaCache(locale);
+
+	// If caching media is enabled
+	if (settings.isCachingMediaEnabled) {
+		await setArticlesMediaCache(locale);
+	}
 }
 
 /**
  * Set cache for articles for all locales
  */
-async function setCacheForAllLocales() {
+async function setCacheForAllLocales(settings: SettingsState) {
 	const apiCache = await caches.open(APIS_CACHE);
 
 	apiCache.add('/api/locales'); // Cache all locales
@@ -121,7 +125,10 @@ async function setCacheForAllLocales() {
 			setArticlesCacheForLocale(locale);
 		});
 
-	await setArticlesMediaCache();
+	// If caching media is enabled
+	if (settings.isCachingMediaEnabled) {
+		await setArticlesMediaCache();
+	}
 }
 
 /**

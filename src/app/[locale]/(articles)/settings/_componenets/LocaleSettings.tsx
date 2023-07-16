@@ -1,8 +1,8 @@
-import { selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { setArticlesCache } from '@/_lib/articlesCaching';
 import { isLocaleSupported } from '@/_lib/locales';
 import { Locale } from '@/_lib/messages';
+import { selectSettingsState, setSettings } from '@/_store/slices/settingsSlice';
 import { FormControl, FormLabel, Select } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';

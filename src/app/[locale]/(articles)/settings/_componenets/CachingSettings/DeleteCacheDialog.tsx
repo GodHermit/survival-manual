@@ -1,6 +1,6 @@
-import { setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { deleteArticlesCache } from '@/_lib/articlesCaching';
+import { setSettings } from '@/_store/slices/settingsSlice';
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, UseDisclosureReturn } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';

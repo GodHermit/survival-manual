@@ -1,6 +1,6 @@
-import { selectSettingsState } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
 import { setArticlesCache } from '@/_lib/articlesCaching';
+import { selectSettingsState } from '@/_store/slices/settingsSlice';
 import { Button, Tooltip } from '@chakra-ui/react';
 import { useLocale, useNow, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
@@ -27,7 +27,7 @@ export default function UpdateCacheButton() {
 	}, [now, settings.cacheLastSyncTimestamp]);
 
 	const handleUpdateCacheClick = () => {
-		if(!isOnline) {
+		if (!isOnline) {
 			return;
 		}
 
@@ -36,7 +36,7 @@ export default function UpdateCacheButton() {
 		}
 	};
 
-	if(!isOnline) {
+	if (!isOnline) {
 		return null;
 	}
 

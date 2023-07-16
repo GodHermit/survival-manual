@@ -1,4 +1,4 @@
-import { SettingsState, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
+import { SettingsState, selectSettingsState, setSettings } from '@/_store/slices/settingsSlice';
 import { FormControl, FormLabel, Select, useColorMode } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import { ChangeEvent, useEffect } from 'react';

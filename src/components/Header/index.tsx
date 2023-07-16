@@ -1,12 +1,12 @@
 
+import { selectSideNavState, toggleSideNav } from '@/_store/slices/sideNavSlice';
 import { Box, ButtonGroup, IconButton, Text, useDisclosure } from '@chakra-ui/react';
+import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import { MdMenu, MdMenuOpen, MdSearch, MdSettings } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSideNavState, toggleSideNav } from '../SideNav/sideNavSlice';
-import HeaderMenu from './HeaderMenu';
 import HeaderSearch from '../SearchModal';
-import { useTranslations } from 'next-intl';
+import HeaderMenu from './HeaderMenu';
 
 export default function Header() {
 	const sideNavState = useSelector(selectSideNavState);
@@ -32,7 +32,7 @@ export default function Header() {
 					icon={<MdSearch />}
 					onClick={searchDisclosure.onOpen}
 				/>
-				<HeaderSearch {...searchDisclosure }/>
+				<HeaderSearch {...searchDisclosure} />
 				<IconButton
 					as={NextLink}
 					href='/settings'

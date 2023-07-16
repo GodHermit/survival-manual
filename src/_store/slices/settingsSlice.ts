@@ -45,6 +45,21 @@ export const settingsSlice = createSlice({
 	}
 });
 
+/**
+ * Remove all `is*Changing` keys from settings object
+ * @param settings current settings
+ * @returns settings without `is*Changing` keys
+ */
+export const drySettings = (settings: SettingsState) => {
+	return Object.fromEntries(
+		Object
+			.entries(settings)
+			.filter(
+				([key]) => !(key.startsWith('is') && key.endsWith('Changing'))
+			)
+	);
+}
+
 export const { setSettings, resetSettings } = settingsSlice.actions;
 
 export const selectSettingsState = (state: { settings: SettingsState }) => state.settings;

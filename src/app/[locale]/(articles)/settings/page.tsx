@@ -1,7 +1,7 @@
 'use client';
 
-import { SettingsState, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_helpers/settingsSlice';
 import useNetworkStatus from '@/_hooks/useNetworkStatus';
+import { drySettings, initialSettings, resetSettings, selectSettingsState, setSettings } from '@/_store/slices/settingsSlice';
 import { Box, Heading, IconButton, Tooltip, useColorMode } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -11,16 +11,7 @@ import CachingSettings from './_componenets/CachingSettings/';
 import ColorModeSettings from './_componenets/ColorModeSettings';
 import FontSizeSettings from './_componenets/FontSizeSettings';
 import LocaleSettings from './_componenets/LocaleSettings';
-
-function drySettings(settings: SettingsState) {
-	return Object.fromEntries(
-		Object
-			.entries(settings)
-			.filter(
-				([key]) => !(key.startsWith('is') && key.endsWith('Changing'))
-			)
-	);
-}
+import { deleteArticlesCache } from '@/_lib/articlesCaching';
 
 export default function SettingsPage() {
 	const state = useSelector(selectSettingsState);
@@ -49,6 +40,7 @@ export default function SettingsPage() {
 
 		router.refresh(); // refresh page to reset locale
 		setColorMode(initialSettings.colorMode); // reset color mode
+		deleteArticlesCache(); // Delete articles cache
 
 		dispatch(setSettings(
 			Object.fromEntries( // set all `is*Changing` properties to false

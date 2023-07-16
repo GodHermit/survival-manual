@@ -1,8 +1,8 @@
+import { selectSideNavState, setSideNav } from '@/_store/slices/sideNavSlice';
 import SideNavMenu from '@/components/SideNav/SideNavMenu';
 import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay } from '@chakra-ui/react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectSideNavState, setSideNav } from './sideNavSlice';
 import { useTranslations } from 'next-intl';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function SideNavMobile() {
 	const state = useSelector(selectSideNavState);
