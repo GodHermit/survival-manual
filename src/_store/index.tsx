@@ -1,11 +1,12 @@
 'use client';
 
 import { setManifestCache, setOfflinePageCache } from '@/_lib/articlesCaching';
+import { settingsMiddleware } from '@/_store/middlewares/settingsMiddleware';
 import articlesSlice, { initialArticlesState } from '@/_store/slices/articlesSlice';
-import settingsSlice, { initialSettings } from '@/_store/slices/settingsSlice';
+import settingsSlice, { drySettings, initialSettings } from '@/_store/slices/settingsSlice';
 import sideNavSlice, { initialSideNavState } from '@/_store/slices/sideNavSlice';
 import { configureStore } from '@reduxjs/toolkit';
-import { getCookie, setCookie } from 'cookies-next';
+import { getCookie } from 'cookies-next';
 
 /**
  * Server-side preloaded state
@@ -27,7 +28,7 @@ const preloadedSettings = (() => {
 
 		// If settings is not in localStorage
 		if (!localStorage.getItem('settings')) {
-			localStorage.setItem('settings', JSON.stringify(initialSettings)); // Set initial settings to localStorage
+			localStorage.setItem('settings', JSON.stringify(drySettings(initialSettings))); // Set initial settings to localStorage
 			isFirstVisit = true; // Set is first visit flag
 		}
 
@@ -37,7 +38,7 @@ const preloadedSettings = (() => {
 		// If locale in localStorage is different from locale in cookie
 		if (preloadedSettings.locale !== localeFromCookie) {
 			preloadedSettings.locale = localeFromCookie; // Set locale from cookie to settings
-			localStorage.setItem('settings', JSON.stringify(preloadedSettings)); // Save settings to localStorage
+			localStorage.setItem('settings', JSON.stringify(drySettings(preloadedSettings))); // Save settings to localStorage
 
 			setManifestCache(localeFromCookie, preloadedSettings); // Add manifest(s) to cache
 
@@ -68,39 +69,9 @@ const store = configureStore({
 			...initialSettings, // Load default settings
 			...preloadedSettings // Load settings from localStorage
 		}
-	}
-});
-
-/**
- * Save settings to localStorage
- */
-store.subscribe(() => {
-	const state = store.getState();
-	localStorage.setItem('settings', JSON.stringify(state.settings));
-});
-
-/**
- * Synchronize NEXT_LOCALE cookie and settings.locale
- */
-store.subscribe(() => {
-	const state = store.getState(); // Get current state
-	const localeInCookie = getCookie('NEXT_LOCALE'); // Get locale from cookie
-
-	setManifestCache(state.settings.locale, state.settings); // Add manifest(s) to cache
-
-	if (localeInCookie !== state.settings.locale) {
-		// If locale in cookie is different from locale in settings, update cookie
-		setCookie( // Set cookie with locale from settings
-			'NEXT_LOCALE',
-			state.settings.locale,
-			{
-				path: '/',
-				sameSite: 'strict',
-			}
-		);
-
-		setOfflinePageCache(); // Add offline page to cache
-	}
+	},
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware().prepend(settingsMiddleware.middleware)
 });
 
 export default store;

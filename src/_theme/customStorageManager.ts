@@ -1,4 +1,4 @@
-import { SettingsState, initialSettings } from '@/_store/slices/settingsSlice';
+import { SettingsState, drySettings, initialSettings } from '@/_store/slices/settingsSlice';
 import { ColorMode, localStorageManager } from '@chakra-ui/react';
 
 export const customStorageManager: typeof localStorageManager = {
@@ -14,6 +14,10 @@ export const customStorageManager: typeof localStorageManager = {
 		if (typeof window === 'undefined') return;
 		const settingsInStorage = localStorage.getItem('settings');
 		const settings: SettingsState = JSON.parse(settingsInStorage || '{}');
-		localStorage.setItem('settings', JSON.stringify({ ...initialSettings, ...settings, colorMode: value }));
+		localStorage.setItem('settings', JSON.stringify({
+			...drySettings(initialSettings),
+			...drySettings(settings),
+			colorMode: settings.colorMode === 'system' ? 'system' : value
+		}));
 	}
 };
