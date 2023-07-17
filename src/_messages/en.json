@@ -1,11 +1,13 @@
 {
 	"title": "Survival Manual",
+	"metadata": {
+		"shortName": "Manual",
+		"description": "A survival manual for the 21st century"
+	},
 	"language": "English",
-	
 	"loading": "Loading",
 	"loadingError": "Loading failed",
 	"tryAgain": "Try again",
-
 	"pageError": {
 		"title": "Oops! Something went wrong",
 		"backHome": "Go to home page"
@@ -15,7 +17,6 @@
 		"backHome": "Go to home page",
 		"webIllustrationBy": "Web illustration by Storyset"
 	},
-
 	"Header": {
 		"menu": "Menu",
 		"search": "Search",
@@ -46,6 +47,10 @@
 		"confirmButton": "Update"
 	},
 	"Settings": {
+		"metadata": {
+			"title": "Settings",
+			"description": "Change the app's settings"
+		},
 		"title": "Settings",
 		"reset": "Reset Settings",
 		"language": "Language",
@@ -89,6 +94,10 @@
 		}
 	},
 	"Offline": {
+		"metadata": {
+			"title": "Network Error",
+			"description": "Page shown when the Internet connection is lost"
+		},
 		"title": "Connect to the Internet",
 		"message": "You're offline. Check your connection."
 	}

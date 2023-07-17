@@ -9,8 +9,8 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 	}
 
 	return {
-		...await generateMetadataFor('Offline', locale),
-		...await generateOGFor('Offline', locale),
+		...await generateMetadataFor('Settings', locale),
+		...await generateOGFor('Settings', locale, '/settings'),
 		alternates: {}, // Disable alternates
 		robots: {
 			index: false // Disable indexing

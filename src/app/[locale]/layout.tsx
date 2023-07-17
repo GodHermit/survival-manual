@@ -1,3 +1,4 @@
+import getURL from '@/_helpers/getURL';
 import { isLocaleSupported } from '@/_lib/locales';
 import { locales } from '@/middleware';
 import { Metadata } from 'next';
@@ -18,22 +19,20 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 		notFound();
 	}
 	const messages = (await import(`@/_messages/${locale}.json`)).default;
-
 	const t = createTranslator({ locale, messages });
 
 	return {
-		title: t('title'),
-		alternates: {
-			canonical: `/`,
-			languages: {
-				'en': '/',
-				'uk': '/uk',
-			},
+		title: {
+			template: `%s | ${t('title')}`,
+			default: t('title')
 		},
+		metadataBase: new URL(getURL('')),
 		icons: {
 			icon: [
 				{
-					url: '/favicon.ico'
+					url: '/favicon.ico',
+					sizes: '48x48',
+					type: 'image/x-icon'
 				},
 				{
 					url: '/assets/favicon-32x32.png',
@@ -48,6 +47,10 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 			],
 			apple: '/assets/apple-touch-icon.png'
 		},
+		themeColor: [
+			{ media: '(prefers-color-scheme: light)', color: '#ffffff' },
+			{ media: '(prefers-color-scheme: dark)', color: '#1a202c' },
+		],
 		manifest: `/manifest.json?locale=${locale}`,
 	};
 }

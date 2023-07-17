@@ -24,9 +24,30 @@ export async function GET(request: NextRequest) {
 
 	return NextResponse.json({
 		'name': t('title'),
-		'short_name': t('title'),
+		'short_name': t('metadata.shortName'),
 		'start_url': '/',
+		'id': '/',
+		'description': t('metadata.description'),
+		'display': 'standalone',
+		'orientation': 'any',
+		'theme_color': '#fff',
+		'background_color': '#fff',
 		'icons': [
+			{
+				'src': '/assets/favicon-16x16.png',
+				'sizes': '16x16',
+				'type': 'image/png'
+			},
+			{
+				'src': '/assets/favicon-32x32.png',
+				'sizes': '32x32',
+				'type': 'image/png'
+			},
+			{
+				'src': '/favicon.ico',
+				'sizes': '48x48',
+				'type': 'image/x-icon',
+			},
 			{
 				'src': '/assets/android-chrome-192x192.png',
 				'sizes': '192x192',
@@ -36,10 +57,13 @@ export async function GET(request: NextRequest) {
 				'src': '/assets/android-chrome-512x512.png',
 				'sizes': '512x512',
 				'type': 'image/png'
+			},
+			{
+				'src': '/assets/maskable-icon-512x512.png',
+				'sizes': '512x512',
+				'type': 'image/png',
+				"purpose": "maskable"
 			}
-		],
-		'theme_color': '#ffffff',
-		'background_color': '#ffffff',
-		'display': 'standalone'
+		]
 	});
 }
