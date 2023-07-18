@@ -1,5 +1,6 @@
 'use server';
 
+import { ArticleMetadata } from '@/_store/slices/articlesSlice';
 import { locales as allLocales } from '@/middleware';
 import { notFound } from 'next/navigation';
 import path from 'path';
@@ -60,9 +61,14 @@ export async function getArticles(locale: string = 'en') {
 			.use(remarkExtractFrontmatter, yaml) // Parse frontmatter
 			.use(html) // Convert markdown to HTML
 			.process(fileContents); // Process file contents
-		const metadata = processedContent.data; // Get metadata
-		const contentHtml = processedContent.toString(); // Get HTML
-		articles.push({ metadata, contentHtml }); // Add article to the array
+
+		articles.push({ // Add article to the array
+			metadata: {
+				...processedContent.data,
+				filename: file,
+			} as ArticleMetadata,
+			contentHtml: processedContent.toString()
+		});
 	}
 
 	return articles;

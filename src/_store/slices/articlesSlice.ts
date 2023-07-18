@@ -2,8 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export interface ArticleMetadata {
 	name: string;
+	description?: string;
 	icon: string;
 	slug: string;
+	filename?: string;
 }
 
 export interface ArticlesState {

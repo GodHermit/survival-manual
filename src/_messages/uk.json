@@ -28,6 +28,23 @@
 		"cancel": "Скасувати",
 		"noResults": "Нічого не знайдено"
 	},
+	"ExportModal": {
+		"title": "Експорт",
+		"exportType": {
+			"label": "Тип експорту",
+			"current": "Поточна сторінка",
+			"allInOne": "Всі сторінки",
+			"allSeparated": "Всі сторінки (окремі файли у zip-архіві)"
+		},
+		"format": {
+			"label": "Формат файлу"
+		},
+		"embeddedMedia": {
+			"label": "Вбудовані медіа"
+		},
+		"cancelButton": "Скасувати",
+		"confirmButton": "Експортувати"
+	},
 	"ShareLinkModal": {
 		"title": "Поділитися посиланням",
 		"copyButton": "Копіювати посилання",

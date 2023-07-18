@@ -35,6 +35,7 @@ export default function HeaderSearch(props: UseDisclosureReturn) {
 					sm: 'sm',
 					md: 'lg'
 				}}
+				isCentered
 			>
 				<ModalOverlay />
 				<ModalContent>
