@@ -1,67 +1,58 @@
-import { ArticleMetadata } from '@/_store/slices/articlesSlice';
 import { Button, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Switch, UseDisclosureReturn, useToast } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { SupportedFormat, downloadFile, getBlob } from './export';
+import { ExportFormat, ExportType } from './export';
 
 export default function ExportModal(props: UseDisclosureReturn) {
-	const [format, setFormat] = useState<SupportedFormat>('html');
-	const [exportType, setExportType] = useState('current');
+	const [format, setFormat] = useState<ExportFormat>('md');
+	const [exportType, setExportType] = useState<ExportType>('current');
 	const [embeddedMedia, setEmbeddedMedia] = useState<boolean>(true);
+	const [isExporting, setIsExporting] = useState<boolean>(false);
 	const t = useTranslations('ExportModal');
 	const tError = useTranslations('pageError');
 	const locale = useLocale();
 	const toast = useToast();
 	const pathname = usePathname();
 
-	const handleExport = async () => {
+	const showErrorMessage = () => {
+		if (toast.isActive('export-error')) {
+			return;
+		}
+		toast({
+			id: 'export-error',
+			position: 'top',
+			status: 'error',
+			title: tError('title'),
+		});
+		setIsExporting(false);
+	};
+
+	const handleExport = () => {
 		try {
-			const res = await fetch(`/api/articles?locale=${locale}&metadataOnly`);
-			const articles = await res.json();
+			setIsExporting(true);
+			const pathnameWithoutLocale = pathname === `/${locale}` ? '/' : pathname.replace(`/${locale}`, '');
+			import('./export').then(module => {
+				module.exportArticles(exportType, format, {
+					embeddedMedia,
+					locale,
+					currentArticleSlug: pathnameWithoutLocale,
+					callback: () => {
+						setIsExporting(false);
+						// props.onClose();
+					}
+				}).catch(error => {
+					showErrorMessage();
+				});
+			});
 
-			switch (exportType) {
-				case 'current':
-					const pathnameWithoutLocale = pathname === `/${locale}` ? '/' : pathname.replace(`/${locale}`, '');
-					const currentArticle = articles.find((article: ArticleMetadata) => article.slug === pathnameWithoutLocale);
-
-					const filename = currentArticle.filename;
-					const file = await getBlob(filename, format, embeddedMedia);
-					downloadFile(
-						file, // Blob
-						filename.replace(
-							filename.split('.').slice(-1), // Get the extension
-							format // Replace the extension with the new one
-						)
-					);
-					break;
-				case 'all-in-one':
-					throw new Error('NOT_IMPLEMENTED');
-					break;
-				case 'all-separated':
-					throw new Error('NOT_IMPLEMENTED');
-					break;
-				default:
-					throw new Error('NOT_SUPPORTED');
-			}
-
-			// If there is an error toast, close it
+			//If there is an error toast, close it
 			if (toast.isActive('export-error')) {
 				toast.close('export-error');
 			}
 		} catch (error) {
-			if (toast.isActive('export-error')) {
-				return;
-			}
-			toast({
-				id: 'export-error',
-				position: 'top',
-				status: 'error',
-				title: tError('title'),
-			});
+			showErrorMessage();
 		}
-
-		props.onClose();
 	};
 
 	return (
@@ -83,7 +74,7 @@ export default function ExportModal(props: UseDisclosureReturn) {
 						<FormLabel>{t('exportType.label')}</FormLabel>
 						<Select
 							value={exportType}
-							onChange={e => setExportType(e.target.value)}
+							onChange={e => setExportType(e.target.value as ExportType)}
 						>
 							<option value='current'>{t('exportType.current')}</option>
 							<option value='all-in-one'>{t('exportType.allInOne')}</option>
@@ -94,23 +85,25 @@ export default function ExportModal(props: UseDisclosureReturn) {
 						<FormLabel>{t('format.label')}</FormLabel>
 						<Select
 							value={format}
-							onChange={e => setFormat(e.target.value as SupportedFormat)}
+							onChange={e => setFormat(e.target.value as ExportFormat)}
 						>
 							<option value='html'>HTML</option>
 							<option value='md'>Markdown</option>
 							<option value='pdf'>PDF</option>
 						</Select>
 					</FormControl>
-					{format === 'html' && (
+					{(format === 'html' || format === 'md') && (
 						<FormControl
 							display='flex'
 							alignItems='center'
 							justifyContent='space-between'
 							mb={1}
+							isDisabled={exportType === 'all-separated'}
 						>
 							<FormLabel m={0}>{t('embeddedMedia.label')}</FormLabel>
+							{/* TODO: tooltip about file size increase */}
 							<Switch
-								isChecked={embeddedMedia}
+								isChecked={embeddedMedia && exportType !== 'all-separated'}
 								onChange={e => setEmbeddedMedia(e.target.checked)}
 							/>
 						</FormControl>
@@ -121,7 +114,11 @@ export default function ExportModal(props: UseDisclosureReturn) {
 					justifyContent='space-between'
 				>
 					<Button onClick={props.onClose}>{t('cancelButton')}</Button>
-					<Button colorScheme='blue' onClick={handleExport}>{t('confirmButton')}</Button>
+					<Button
+						colorScheme='blue'
+						onClick={handleExport}
+						isLoading={isExporting}
+					>{t('confirmButton')}</Button>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

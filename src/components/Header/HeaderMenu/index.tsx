@@ -41,7 +41,7 @@ export default function HeaderMenu() {
 				>
 					{t('Header.export')}
 				</MenuItem>
-				<ExportModal {...exportModalDisclosure} isOpen />
+				<ExportModal {...exportModalDisclosure} />
 				<MenuItem
 					icon={<MdLink />}
 					onClick={shareLinkDisclosure.onOpen}
