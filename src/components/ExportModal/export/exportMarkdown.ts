@@ -1,7 +1,6 @@
 import embedMedia from '@/_helpers/embedMedia';
 import { ArticleMetadata } from '@/_store/slices/articlesSlice';
 import { downloadZip } from 'client-zip';
-import { createTranslator } from 'next-intl';
 import { remark } from 'remark';
 import remarkExtractFrontmatter from 'remark-extract-frontmatter';
 import remarkFrontmatter from 'remark-frontmatter';
@@ -62,7 +61,7 @@ export async function exportAllArticlesAsMarkdown(articles: ArticleMetadata[], o
 	let markdownString = '';
 	for (let i = 0; i < articles.length; i++) {
 		const article = articles[i];
-		const res = await fetch(`/wiki/en/${article.filename}`);
+		const res = await fetch(`/wiki/${options.locale}/${article.filename}`);
 		const markdown = await res.text();
 
 		const fileContent = await parseMarkdown(markdown, {
@@ -72,10 +71,7 @@ export async function exportAllArticlesAsMarkdown(articles: ArticleMetadata[], o
 		markdownString += (i < articles.length - 1) ? '\n' : ''; // Add a new line between articles
 	}
 
-	const t = createTranslator({ // TODO: use translator from options
-		locale: options.locale,
-		messages: await import(`@/_messages/${options.locale}.json`)
-	});
+	const t = options.translator; // Get translator from options
 
 	downloadFile(
 		new Blob([markdownString], { type: 'text/markdown' }),
@@ -125,7 +121,7 @@ export async function exportAllArticlesSeparatedAsMarkdown(articles: ArticleMeta
 	}
 
 	for (const article of articles) {
-		const res = await fetch(`/wiki/en/${article.filename}`);
+		const res = await fetch(`/wiki/${options.locale}/${article.filename}`);
 		const markdown = await res.text();
 
 		const fileContent = await parseMarkdown(markdown, {
@@ -144,10 +140,7 @@ export async function exportAllArticlesSeparatedAsMarkdown(articles: ArticleMeta
 
 	const zipFile = await downloadZip(files).blob();
 
-	const t = createTranslator({ // Create translator
-		locale: options.locale,
-		messages: await import(`@/_messages/${options.locale}.json`)
-	});
+	const t = options.translator; // Get translator from options
 
 	downloadFile(
 		zipFile,

@@ -43,7 +43,8 @@
 			"label": "File format"
 		},
 		"embeddedMedia": {
-			"label": "Embed media"
+			"label": "Embed media",
+			"warningTooltip": "This will increase the size of the exported file" 
 		},
 		"cancelButton": "Скасувати",
 		"confirmButton": "Експортувати"

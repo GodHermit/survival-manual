@@ -1,5 +1,6 @@
 import { isLocaleSupported } from '@/_lib/locales';
 import { ArticleMetadata } from '@/_store/slices/articlesSlice';
+import { useTranslations } from 'next-intl';
 import { exportAllArticlesAsHTML, exportAllArticlesSeparatedAsHTML, exportCurrentArticleAsHTML } from './exportHTML';
 import { exportAllArticlesAsMarkdown, exportAllArticlesSeparatedAsMarkdown, exportCurrentArticleAsMarkdown } from './exportMarkdown';
 
@@ -33,6 +34,10 @@ export type ExportOptions = {
 	 * Name of the exported file
 	 */
 	filename?: string;
+	/**
+	 * Function to translate messages
+	 */
+	translator: (namespace: Parameters<typeof useTranslations>[0]) => string;
 	/**
 	 * Function to be called after the export is done
 	 */
@@ -68,7 +73,7 @@ export async function exportArticles(type: ExportType, format: ExportFormat, opt
 
 	const articles: ArticleMetadata[] = await res.json();
 	if (articles.length <= 0) {
-		throw new Error('NOT_FOUND');
+		throw new Error('NOTHING_TO_EXPORT');
 	}
 
 	switch (type) {
@@ -97,7 +102,7 @@ export async function exportArticles(type: ExportType, format: ExportFormat, opt
 }
 
 async function exportCurrentArticle(articleMetadata: ArticleMetadata, format: ExportFormat, options: ExportOptions) {
-	const res = await fetch(`/wiki/en/${articleMetadata.filename}`);
+	const res = await fetch(`/wiki/${options.locale}/${articleMetadata.filename}`);
 	const markdown = await res.text();
 
 	switch (format) {

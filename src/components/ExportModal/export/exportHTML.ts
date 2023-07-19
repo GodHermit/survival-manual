@@ -2,7 +2,6 @@ import embedMedia from '@/_helpers/embedMedia';
 import { ArticleMetadata } from '@/_store/slices/articlesSlice';
 import { downloadZip } from 'client-zip';
 import { Metadata } from 'next';
-import { createTranslator } from 'next-intl';
 import { remark } from 'remark';
 import remarkExtractFrontmatter from 'remark-extract-frontmatter';
 import remarkFrontmatter from 'remark-frontmatter';
@@ -83,7 +82,7 @@ export async function exportCurrentArticleAsHTML(markdown: string, options: Expo
 		options.filename?.split('.').slice(-1)[0],
 		''
 	);
-	downloadFile(file, `${filename}.html`); // Download file
+	downloadFile(file, `${filename}html`); // Download file
 	options.callback?.(); // Call callback
 }
 
@@ -95,7 +94,7 @@ export async function exportCurrentArticleAsHTML(markdown: string, options: Expo
 export async function exportAllArticlesAsHTML(articles: ArticleMetadata[], options: ExportOptions) {
 	let HTMLString = '';
 	for (const article of articles) {
-		const res = await fetch(`/wiki/en/${article.filename}`);
+		const res = await fetch(`/wiki/${options.locale}/${article.filename}`);
 		const markdown = await res.text();
 
 		const fileContent = await parseMarkdownToHTML(markdown, {
@@ -104,10 +103,7 @@ export async function exportAllArticlesAsHTML(articles: ArticleMetadata[], optio
 		HTMLString += fileContent.toString(); // Add HTML to the string
 	}
 
-	const t = createTranslator({ // Create translator
-		locale: options.locale,
-		messages: await import(`@/_messages/${options.locale}.json`)
-	});
+	const t = options.translator; // Get translator from options
 
 	const file = toHTMLFile( // Create HTML file
 		HTMLString,
@@ -165,7 +161,7 @@ export async function exportAllArticlesSeparatedAsHTML(articles: ArticleMetadata
 	}
 
 	for (const article of articles) {
-		const res = await fetch(`/wiki/en/${article.filename}`);
+		const res = await fetch(`/wiki/${options.locale}/${article.filename}`);
 		const markdown = await res.text();
 
 		const fileContent = await parseMarkdownToHTML(markdown, {
@@ -200,10 +196,7 @@ export async function exportAllArticlesSeparatedAsHTML(articles: ArticleMetadata
 
 	const zipFile = await downloadZip(files).blob();
 
-	const t = createTranslator({ // Create translator
-		locale: options.locale,
-		messages: await import(`@/_messages/${options.locale}.json`)
-	});
+	const t = options.translator; // Get translator from options
 
 	downloadFile(
 		zipFile,

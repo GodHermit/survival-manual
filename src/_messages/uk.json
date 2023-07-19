@@ -40,7 +40,8 @@
 			"label": "Формат файлу"
 		},
 		"embeddedMedia": {
-			"label": "Вбудовані медіа"
+			"label": "Вбудовані медіа",
+			"warningTooltip": "Це збільшить розмір експортованого файлу"
 		},
 		"cancelButton": "Скасувати",
 		"confirmButton": "Експортувати"
