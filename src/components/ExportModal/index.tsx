@@ -2,21 +2,59 @@ import { selectArticlesState } from '@/_store/slices/articlesSlice';
 import { Box, Button, FormControl, FormLabel, Icon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Skeleton, Switch, Tooltip, UseDisclosureReturn, useToast } from '@chakra-ui/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { MdInfo } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { ExportFormat, ExportType } from './export';
 
+interface ExportModalState {
+	format: ExportFormat;
+	exportType: ExportType;
+	embeddedMedia: boolean;
+	isExporting: boolean;
+	isCurrentArticleDefined: boolean;
+}
+
+const initialState: ExportModalState = {
+	format: 'html',
+	exportType: 'all-in-one',
+	embeddedMedia: true,
+	isExporting: false,
+	isCurrentArticleDefined: false,
+};
+
 export default function ExportModal(props: UseDisclosureReturn) {
-	const [format, setFormat] = useState<ExportFormat>('html');
-	const [exportType, setExportType] = useState<ExportType>('current');
-	const [embeddedMedia, setEmbeddedMedia] = useState<boolean>(true);
-	const [isExporting, setIsExporting] = useState<boolean>(false);
+	const [state, setState] = useReducer((state: ExportModalState, newState: Partial<ExportModalState>) => ({
+		...state,
+		...newState,
+	}), initialState);
 	const articlesState = useSelector(selectArticlesState);
 	const t = useTranslations();
 	const locale = useLocale();
 	const toast = useToast();
 	const pathname = usePathname();
+	const pathnameWithoutLocale = pathname === `/${locale}` ? '/' : pathname.replace(`/${locale}`, '');
+
+	useEffect(() => {
+		if (!articlesState.isLoading) {
+			// If the current article is defined, set the export type to current
+			if (
+				articlesState.articlesMetadata.some( // Check if the current pathname is in the articles metadata
+					article => article.slug === pathnameWithoutLocale
+				)
+			) {
+				setState({
+					exportType: 'current',
+					isCurrentArticleDefined: true,
+				});
+			} else {
+				setState({
+					exportType: initialState.exportType,
+					isCurrentArticleDefined: false
+				});
+			}
+		}
+	}, [articlesState.articlesMetadata, articlesState.isLoading, pathnameWithoutLocale]);
 
 	const showErrorMessage = () => {
 		if (toast.isActive('export-error')) {
@@ -28,7 +66,7 @@ export default function ExportModal(props: UseDisclosureReturn) {
 			status: 'error',
 			title: t('pageError.title'),
 		});
-		setIsExporting(false);
+		setState({ isExporting: false })
 	};
 
 	const handleExport = () => {
@@ -38,23 +76,22 @@ export default function ExportModal(props: UseDisclosureReturn) {
 		}
 
 		// If user is already exporting, don't do anything
-		if (isExporting) {
+		if (state.isExporting) {
 			return;
 		}
 
 		try {
-			setIsExporting(true);
-			console.log(typeof useTranslations);
-			const pathnameWithoutLocale = pathname === `/${locale}` ? '/' : pathname.replace(`/${locale}`, '');
+			setState({ isExporting: true });
+
 			import('./export').then(module => {
-				module.exportArticles(exportType, format, {
+				module.exportArticles(state.exportType, state.format, {
 					articles: articlesState.articlesMetadata,
-					embeddedMedia,
+					embeddedMedia: state.embeddedMedia,
 					locale,
 					currentArticleSlug: pathnameWithoutLocale,
 					translator: (namespace: Parameters<typeof useTranslations>[0]) => t(namespace),
 					callback: () => {
-						setIsExporting(false);
+						setState({ isExporting: false });
 						// props.onClose();
 					}
 				}).catch(error => {
@@ -97,10 +134,12 @@ export default function ExportModal(props: UseDisclosureReturn) {
 							isLoaded={!articlesState.isLoading}
 						>
 							<Select
-								value={exportType}
-								onChange={e => setExportType(e.target.value as ExportType)}
+								value={state.exportType}
+								onChange={e => setState({ exportType: e.target.value as ExportType })}
 							>
-								<option value='current'>{t('ExportModal.exportType.current')}</option>
+								{state.isCurrentArticleDefined && (
+									<option value='current'>{t('ExportModal.exportType.current')}</option>
+								)}
 								<option value='all-in-one'>{t('ExportModal.exportType.allInOne')}</option>
 								<option value='all-separated'>{t('ExportModal.exportType.allSeparated')}</option>
 							</Select>
@@ -120,8 +159,8 @@ export default function ExportModal(props: UseDisclosureReturn) {
 							isLoaded={!articlesState.isLoading}
 						>
 							<Select
-								value={format}
-								onChange={e => setFormat(e.target.value as ExportFormat)}
+								value={state.format}
+								onChange={e => setState({ format: e.target.value as ExportFormat })}
 							>
 								<option value='html'>HTML</option>
 								<option value='md'>Markdown</option>
@@ -129,12 +168,12 @@ export default function ExportModal(props: UseDisclosureReturn) {
 							</Select>
 						</Skeleton>
 					</FormControl>
-					{(format === 'html' || format === 'md') && (
+					{(state.format === 'html' || state.format === 'md') && (
 						<FormControl
 							display='flex'
 							alignItems='center'
 							mb={1}
-							isDisabled={exportType === 'all-separated' || articlesState.isLoading}
+							isDisabled={state.exportType === 'all-separated' || articlesState.isLoading}
 						>
 							<Skeleton
 								fitContent
@@ -148,7 +187,7 @@ export default function ExportModal(props: UseDisclosureReturn) {
 									{t('ExportModal.embeddedMedia.label')}
 									<Tooltip
 										label={t('ExportModal.embeddedMedia.warningTooltip')}
-										isDisabled={exportType === 'all-separated'}
+										isDisabled={state.exportType === 'all-separated'}
 									>
 										<Box
 											as='span'
@@ -170,8 +209,8 @@ export default function ExportModal(props: UseDisclosureReturn) {
 							>
 
 								<Switch
-									isChecked={embeddedMedia && exportType !== 'all-separated'}
-									onChange={e => setEmbeddedMedia(e.target.checked)}
+									isChecked={state.embeddedMedia && state.exportType !== 'all-separated'}
+									onChange={e => setState({ embeddedMedia: e.target.checked })}
 								/>
 							</Skeleton>
 						</FormControl>
@@ -183,7 +222,7 @@ export default function ExportModal(props: UseDisclosureReturn) {
 				>
 					<Button
 						onClick={props.onClose}
-						isDisabled={isExporting}
+						isDisabled={state.isExporting}
 					>
 						{t('ExportModal.cancelButton')}
 					</Button>
@@ -197,7 +236,7 @@ export default function ExportModal(props: UseDisclosureReturn) {
 						<Button
 							colorScheme='blue'
 							onClick={handleExport}
-							isLoading={isExporting}
+							isLoading={state.isExporting}
 						>
 							{t('ExportModal.confirmButton')}
 						</Button>
