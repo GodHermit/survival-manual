@@ -17,6 +17,11 @@ export type ExportType = 'current' | 'all-in-one' | 'all-separated';
  */
 export type ExportOptions = {
 	/**
+	 * List of articles to export
+	 * (if not provided, all articles will be fetched from the server)
+	 */
+	articles?: ArticleMetadata[];
+	/**
 	 * Whether to include media files in the exported file or not
 	 */
 	embeddedMedia: boolean;
@@ -65,14 +70,19 @@ export async function exportArticles(type: ExportType, format: ExportFormat, opt
 		throw new Error(`Locale ${options.locale} is not supported`);
 	}
 
-	// FIXME: get articles from the store
-	const res = await fetch(`/api/articles?locales=${options.locale}&metadataOnly=true`);
-	if (!res.ok) {
-		throw new Error('NOT_FOUND');
+	let articles = options.articles;
+
+	// If the articles are not provided, fetch them from the server
+	if (!options.articles) {
+		const res = await fetch(`/api/articles?locales=${options.locale}&metadataOnly=true`);
+		if (!res.ok) {
+			throw new Error('NOT_FOUND');
+		}
+
+		articles = await res.json();
 	}
 
-	const articles: ArticleMetadata[] = await res.json();
-	if (articles.length <= 0) {
+	if (!articles || articles.length <= 0) {
 		throw new Error('NOTHING_TO_EXPORT');
 	}
 
