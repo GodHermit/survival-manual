@@ -2,7 +2,7 @@
 import { selectSideNavState, toggleSideNav } from '@/_store/slices/sideNavSlice';
 import { Box, ButtonGroup, IconButton, Text, useDisclosure } from '@chakra-ui/react';
 import { useTranslations } from 'next-intl';
-import NextLink from 'next/link';
+import NextLink from 'next-intl/link';
 import { MdMenu, MdMenuOpen, MdSearch, MdSettings } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import HeaderSearch from '../SearchModal';

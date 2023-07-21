@@ -67,6 +67,13 @@ self.addEventListener('activate', async (e) => {
 	}
 });
 
+const ignoreSearchParams = [
+	{
+		param: 'locale',
+		path: '/api/articlesMedia'
+	}
+]
+
 self.addEventListener('fetch', (e) => {
 	if (!e.request.url.startsWith(self.origin)) {
 		return;
@@ -79,7 +86,7 @@ self.addEventListener('fetch', (e) => {
 	const urlWithoutParams = url.replace(/\?.*/, '');
 	const isRsc = /\?_rsc/.test(url);
 
-	if (/\/(?:assets|_next|favicon|manifest).*/i.test(urlWithoutParams)) { // exclude static assets and nextjs files+
+	if (/^\/(assets|_next|favicon|manifest).*/i.test(urlWithoutParams)) { // exclude static assets and nextjs files+
 		return;
 	}
 
@@ -98,8 +105,19 @@ self.addEventListener('fetch', (e) => {
 					return Response.error(); // Return error response
 				}
 
+				let ignoreSearch = false;
+
+				// For some routes, need to ignore search params
+				for (let { param, path } of ignoreSearchParams) { // For each param to ignore
+					// If path matches
+					if (urlWithoutParams.startsWith(path) && new URL(e.request.url).searchParams.has(param)) {
+						// Ignore search params
+						ignoreSearch = true;
+					}
+				}
+
 				// Get cached response
-				const res = await caches.match(url);
+				const res = await caches.match(url, { ignoreSearch });
 
 				// If cached response exists
 				if (res) {

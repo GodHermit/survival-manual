@@ -15,8 +15,7 @@ export const defaultLocale: string = locales.find(locale => locale === 'en') || 
  * (Pathnames of this page are always without locale prefix)
  */
 export const pagesWithoutLocalePrefix = [
-	'/offline',
-	'/settings'
+	'/offline'
 ];
 /**
  * List of all paths that should not be internationalized

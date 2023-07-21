@@ -35,6 +35,10 @@ const preloadedSettings = (() => {
 		let preloadedSettings = JSON.parse(localStorage.getItem('settings') || '{}'); // Get settings from localStorage
 		const localeFromCookie = getCookie('NEXT_LOCALE') as string; // Get locale from cookie
 
+		if(isFirstVisit) {
+			setManifestCache(localeFromCookie, preloadedSettings); // Add manifest(s) to cache
+		}
+
 		// If locale in localStorage is different from locale in cookie
 		if (preloadedSettings.locale !== localeFromCookie) {
 			preloadedSettings.locale = localeFromCookie; // Set locale from cookie to settings
