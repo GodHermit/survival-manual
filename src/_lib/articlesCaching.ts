@@ -10,6 +10,7 @@ export const MANIFEST_CACHE = 'manifest';
 export const APIS_CACHE = 'apis';
 export const ARTICLES_CACHE = 'articles';
 export const ARTICLES_MEDIA_CACHE = 'articles-media';
+export const ARTICLES_MARKDOWN_CACHE = 'articles-md';
 
 const APP_PAGES = [
 	'/settings',
@@ -90,6 +91,7 @@ export function deleteArticlesCache() {
 	caches.delete(APIS_CACHE);
 	caches.delete(ARTICLES_CACHE);
 	caches.delete(ARTICLES_MEDIA_CACHE);
+	caches.delete(ARTICLES_MARKDOWN_CACHE);
 }
 
 /**
@@ -97,14 +99,15 @@ export function deleteArticlesCache() {
  * @param {string} locale current locale selected by user (default: 'en')
  */
 async function setCacheForCurrentLocale(locale: string = 'en', settings: SettingsState) {
-	await setPagesCache(locale);
-	await setAPIsCache(locale);
+	await setPagesCache(locale); // Cache pages for current locale
+	await setAPIsCache(locale); // Cache APIs for current locale
 
-	await setArticlesCacheForLocale(locale);
+	await setArticlesCacheForLocale(locale); // Cache articles for current locale
+	await setArticlesMDCache(locale); // Cache articles markdown files for current locale
 
 	// If caching media is enabled
 	if (settings.isCachingMediaEnabled) {
-		await setArticlesMediaCache(locale);
+		await setArticlesMediaCache(locale); // Cache articles media files for current locale
 	}
 }
 
@@ -115,6 +118,7 @@ async function setCacheForAllLocales(settings: SettingsState) {
 	const apiCache = await caches.open(APIS_CACHE);
 
 	apiCache.add('/api/locales'); // Cache all locales
+	apiCache.add('/api/articlesMedia?locale=everyLocale'); // Cache api of articles' media files for all locales
 
 	locales
 		.forEach(async locale => {
@@ -123,6 +127,7 @@ async function setCacheForAllLocales(settings: SettingsState) {
 			apiCache.add(`/api/articles?locale=${locale}&metadataOnly=true`); // Cache articles metadata for current locale
 
 			setArticlesCacheForLocale(locale);
+			setArticlesMDCache(locale); // Cache articles markdown files
 		});
 
 	// If caching media is enabled
@@ -275,6 +280,7 @@ async function setAPIsCache(locale: string = 'en') {
 	const apiCache = await caches.open(APIS_CACHE);
 
 	apiCache.add(`/api/articles?locale=${locale}&metadataOnly=true`); // Cache articles metadata for current locale
+	apiCache.add(`/api/articlesMedia?locale=${locale}`); // Cache api of articles' media files
 
 	const locales = await (await fetch('/api/locales')).json();
 	const currentLocaleData = locales.find((l: Locale) => l.code === locale);
@@ -374,4 +380,30 @@ export async function setArticlesMediaCache(locale?: string) {
 		});
 	}
 
+}
+
+/**
+ * Add articles markdown files to cache
+ * @param {string} locale locale of articles files to cache (default: 'en') 
+ */
+async function setArticlesMDCache(locale: string = 'en') {
+	const articleMetadata: ArticleMetadata[] = await (await fetch(`/api/articles?locale=${locale}&metadataOnly=true`)).json();
+
+	const articlesMDCache = await caches.open(ARTICLES_MARKDOWN_CACHE);
+	const cacheToDelete = await articlesMDCache.keys();
+
+	// Array of paths to articles markdown files
+	const paths = articleMetadata.map(article => (`/wiki/${locale}/${article.filename}`));
+
+	// Cache articles markdown files
+	articlesMDCache.addAll(paths);
+
+	if (cacheToDelete.length > 0) { // If there are old articles cache
+		cacheToDelete.forEach(cache => { // Delete old articles cache
+			if (!articleMetadata.some(article => `/wiki/${locale}/${article.filename}.md` === getRelativeURL(cache.url))) {
+				// If cache is not in new articles cache
+				articlesMDCache.delete(cache);
+			}
+		});
+	}
 }

@@ -46,7 +46,7 @@ export default function LocaleSettings() {
 		}
 
 		startTransition(() => {
-			router.refresh();
+			router.replace(`/${e.target.value}/settings`);
 		});
 	};
 

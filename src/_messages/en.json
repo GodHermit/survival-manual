@@ -31,6 +31,24 @@
 		"cancel": "Cancel",
 		"noResults": "No results found"
 	},
+	"ExportModal": {
+		"title": "Export",
+		"exportType": {
+			"label": "Export type",
+			"current": "Current article",
+			"allInOne": "All articles",
+			"allSeparated": "All articles (separated files in a zip archive)"
+		},
+		"format": {
+			"label": "File format"
+		},
+		"embeddedMedia": {
+			"label": "Embed media",
+			"warningTooltip": "This will increase the size of the exported file" 
+		},
+		"cancelButton": "Скасувати",
+		"confirmButton": "Експортувати"
+	},
 	"ShareLinkModal": {
 		"title": "Share link",
 		"copyButton": "Copy link",

@@ -31,5 +31,10 @@ settingsMiddleware.startListening({
 			setManifestCache(settings.locale, settings); // Add manifest(s) to cache
 			setOfflinePageCache(); // Add offline page to cache
 		}
+
+		// If cache locales changed (previous cache locales !== current cache locales)
+		if (prevSettings.cacheLocales !== settings.cacheLocales) {
+			setManifestCache(settings.locale, settings); // Add manifest(s) to cache
+		}
 	}
 });

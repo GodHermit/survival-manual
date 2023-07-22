@@ -42,6 +42,7 @@ export default function ShareLinkModal(props: UseDisclosureReturn) {
 				base: 'xs',
 				md: 'md',
 			}}
+			isCentered
 		>
 			<ModalOverlay />
 			<ModalContent>
