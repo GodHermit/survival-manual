@@ -164,7 +164,6 @@ export default function ExportModal(props: UseDisclosureReturn) {
 							>
 								<option value='html'>HTML</option>
 								<option value='md'>Markdown</option>
-								<option value='pdf'>PDF</option>
 							</Select>
 						</Skeleton>
 					</FormControl>

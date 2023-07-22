@@ -122,9 +122,6 @@ async function exportCurrentArticle(articleMetadata: ArticleMetadata, format: Ex
 		case 'md':
 			exportCurrentArticleAsMarkdown(markdown, options);
 			break;
-		case 'pdf':
-			throw new Error('NOT_IMPLEMENTED');
-			break;
 		default:
 			throw new Error(`Unknown export format: ${format}`);
 	}
@@ -138,9 +135,6 @@ function exportAllArticles(articles: ArticleMetadata[], format: ExportFormat, op
 		case 'md':
 			exportAllArticlesAsMarkdown(articles, options);
 			break;
-		case 'pdf':
-			throw new Error('NOT_IMPLEMENTED');
-			break;
 		default:
 			throw new Error(`Unknown export format: ${format}`);
 	}
@@ -153,9 +147,6 @@ function exportAllArticlesSeparated(articles: ArticleMetadata[], format: ExportF
 			break;
 		case 'md':
 			exportAllArticlesSeparatedAsMarkdown(articles, options);
-			break;
-		case 'pdf':
-			throw new Error('NOT_IMPLEMENTED');
 			break;
 		default:
 			throw new Error(`Unknown export format: ${format}`);
