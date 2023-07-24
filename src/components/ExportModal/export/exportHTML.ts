@@ -46,7 +46,7 @@ function toHTMLFile(HTMLString: string, metadata: Metadata): Blob {
 		`<html>
 			<head>
 				<title>${metadata.title}</title>
-				<meta charset='utf-8'/>
+				<meta charset='utf-8' />
 				<meta name='viewport' content='width=device-width, initial-scale=1.0' />
 				${metadata.description ? `<meta name='description' content='${metadata.description}' />` : ''}
 			</head>
