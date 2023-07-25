@@ -87,7 +87,7 @@ export default function SideNavMenu() {
 		return (
 			<VStack
 				h='100%'
-				p={4}
+				p={state.isOpen ? 4 : 2}
 				justifyContent='center'
 				spacing={2}
 			>
