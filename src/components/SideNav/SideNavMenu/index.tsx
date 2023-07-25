@@ -140,11 +140,14 @@ export default function SideNavMenu() {
 							/>
 						);
 					case 'groupName':
-						return ((isDesktop && state.isOpen) &&
+						return ((state.isOpen) &&
 							<Text
 								fontSize='sm'
 								fontWeight={600}
-								color='gray.600'
+								color={{
+									base: 'gray.500',
+									md: 'gray.600'
+								}}
 								pl={2}
 								pr={2}
 								pb={1}
