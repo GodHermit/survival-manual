@@ -1,10 +1,10 @@
 import getURL from '@/_helpers/getURL';
-import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UseDisclosureReturn, useClipboard, useToast } from '@chakra-ui/react';
+import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UseDisclosureReturn, useClipboard, useColorModeValue, useToast } from '@chakra-ui/react';
+import { useTranslations } from 'next-intl';
 import { useQRCode } from 'next-qrcode';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { MdLink } from 'react-icons/md';
-import { useTranslations } from 'next-intl';
 
 export default function ShareLinkModal(props: UseDisclosureReturn) {
 	const pathname = usePathname();
@@ -12,6 +12,13 @@ export default function ShareLinkModal(props: UseDisclosureReturn) {
 	const toast = useToast();
 	const { SVG } = useQRCode();
 	const t = useTranslations('ShareLinkModal');
+	const QRColor = useColorModeValue({
+		light: '#fff',
+		dark: '#000'
+	}, {
+		light: 'grey.800',
+		dark: '#fff'
+	});
 
 	useEffect(() => {
 		setValue(getURL(pathname));
@@ -49,7 +56,12 @@ export default function ShareLinkModal(props: UseDisclosureReturn) {
 				<ModalHeader>{t('title')}</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
-					<SVG text={value} />
+					<SVG
+						text={value}
+						options={{
+							color: QRColor
+						}}
+					/>
 					<Input
 						type='url'
 						value={value}
